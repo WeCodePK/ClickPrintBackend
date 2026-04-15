@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
+
 const { resp } = require('./misc');
+const Admin = require('../models/Admin');
 
 exports.jwtAuth = (req, res, next) => {
   const header = req.headers.authorization;
@@ -34,4 +36,26 @@ exports.keyAuth = (req, res, next) => {
   }
 
   return next();
+};
+
+exports.isAdmin = async (arg, res, next) => {
+  const isMiddleware = typeof next === 'function';
+  const uid = isMiddleware ? arg?.token?.uid : arg;
+
+  try {
+    if (!uid) {
+      if (isMiddleware) return res.status(401).json({ error: 'No uid provided' });
+      return false;
+    }
+
+    const exists = await Admin.exists({ user: uid });
+
+    if (isMiddleware) {
+      return exists ? next() : res.status(403).json({ error: 'Admin access required' });
+    }
+    return Boolean(exists);
+  } catch (err) {
+    if (isMiddleware) return res.status(401).json({ error: 'Invalid uid' });
+    return false;
+  }
 };

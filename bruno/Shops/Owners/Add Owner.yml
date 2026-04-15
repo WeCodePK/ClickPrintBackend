@@ -1,0 +1,22 @@
+info:
+  name: Add Owner
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{host}}/api/shops/:shopId/owners/:userId"
+  params:
+    - name: userId
+      value: ""
+      type: path
+    - name: shopId
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
