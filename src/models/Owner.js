@@ -41,4 +41,10 @@ ownerSchema.index({ user: 1, shop: 1 }, { unique: true });
 
 const Owner = mongoose.model('Owner', ownerSchema);
 
+Owner.ownerPopulate = [
+  { path: 'user', select: 'name number' },
+  { path: 'shop', select: 'name' },
+  { path: 'appointedBy', select: 'name number' },
+];
+
 module.exports = Owner;

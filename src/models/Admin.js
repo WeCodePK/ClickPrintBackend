@@ -30,4 +30,9 @@ adminSchema.index({ user: 1 }, { unique: true });
 
 const Admin = mongoose.model('Admin', adminSchema);
 
+Admin.adminPopulate = [
+  { path: 'user', select: 'name number' },
+  { path: 'appointedBy', select: 'name number' },
+];
+
 module.exports = Admin;
