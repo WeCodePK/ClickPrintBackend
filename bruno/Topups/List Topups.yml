@@ -1,7 +1,7 @@
 info:
   name: List Topups
   type: http
-  seq: 4
+  seq: 3
 
 http:
   method: GET

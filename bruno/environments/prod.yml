@@ -1,7 +1,7 @@
 name: prod
 variables:
   - name: host
-    value: https://click-print-backend-prod.wckd.pk
+    value: https://clickprintbackend.wckd.pk
   - secret: true
     name: token
   - secret: true

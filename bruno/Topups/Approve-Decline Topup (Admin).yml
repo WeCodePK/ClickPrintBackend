@@ -1,5 +1,5 @@
 info:
-  name: Approve/Decline Topup
+  name: Approve/Decline Topup (Admin)
   type: http
   seq: 4
 
@@ -14,7 +14,7 @@ http:
     type: json
     data: |-
       {
-        "action": "approve"
+        "status": "approved"
       }
   auth: inherit
 
