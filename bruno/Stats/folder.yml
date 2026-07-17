@@ -1,7 +1,7 @@
 info:
   name: Stats
   type: folder
-  seq: 12
+  seq: 10
 
 request:
   auth: inherit

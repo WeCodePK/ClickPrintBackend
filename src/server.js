@@ -77,13 +77,11 @@ app.get('/health', async (req, res) => {
 
 app.use('/api/auth', require('./routes/Auth.js'));
 app.use('/api/files', require('./routes/Files.js'));
-
 app.use('/api/jobs', jwtAuth, require('./routes/Jobs.js'));
 app.use('/api/shops', jwtAuth, require('./routes/Shops.js'));
 app.use('/api/stats', jwtAuth, require('./routes/Stats.js'));
 app.use('/api/users', jwtAuth, require('./routes/Users.js'));
 app.use('/api/drafts', jwtAuth, require('./routes/Drafts.js'));
-app.use('/api/events', jwtAuth, require('./routes/Events.js'));
 app.use('/api/topups', jwtAuth, require('./routes/Topups.js'));
 app.use('/api/history', jwtAuth, require('./routes/History.js'));
 app.use('/api/profile', jwtAuth, require('./routes/Profile.js'));
