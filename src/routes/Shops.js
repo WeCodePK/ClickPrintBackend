@@ -97,6 +97,8 @@ router.patch('/:shopId/isDisabled', validateObjectIds('shopId'), async (req, res
 // -------------------------------------------------------------------------- //
 
 router.delete('/:shopId', validateObjectIds('shopId'), async (req, res) => {
+  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
+
   return resp(res, 501, 'not implemented yet');
 });
 
