@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{host}}/api/realtime/events"
+  url: "{{host}}/api/events"
   auth: inherit
 
 settings:

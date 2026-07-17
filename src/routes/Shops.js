@@ -104,4 +104,19 @@ router.delete('/:shopId', validateObjectIds('shopId'), async (req, res) => {
 
 // -------------------------------------------------------------------------- //
 
+router.patch('/:shopId/status', validateObjectIds('shopId'), async (req, res) => {
+  if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
+
+  const shop = await Shop.findByIdAndUpdate(
+    req.params.shopId,
+    { lastSeen: new Date() },
+    { returnDocument: 'after' }
+  );
+
+  if (!shop) return resp(res, 404, 'not found');
+  return resp(res, 200, 'status updated', { shop });
+});
+
+// -------------------------------------------------------------------------- //
+
 module.exports = router;
