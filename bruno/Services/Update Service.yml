@@ -5,8 +5,11 @@ info:
 
 http:
   method: PUT
-  url: "{{host}}/api/services/:serviceId"
+  url: "{{host}}/api/services/:shopId/:serviceId"
   params:
+    - name: shopId
+      value: ""
+      type: path
     - name: serviceId
       value: 6a53d24864e5a3b32bbb7eb8
       type: path

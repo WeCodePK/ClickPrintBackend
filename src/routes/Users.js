@@ -3,8 +3,8 @@ const router = express.Router();
 
 const User = require('../models/User');
 
-const { isAdmin, isAdmin } = require('../func/auth');
-const { resp, validateObjectIds, isValidE164NoPlus } = require('../func/misc');
+const { isAdmin } = require('../func/auth');
+const { resp, validateObjectIds, isValidPhoneNumber } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
@@ -12,7 +12,7 @@ router.post('/', isAdmin, async (req, res) => {
   const { name, number } = req.body || {};
 
   if (!number) return resp(res, 400, 'missing or invalid field(s) (number)');
-  if (!isValidE164NoPlus(number)) {
+  if (!isValidPhoneNumber(number)) {
     return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
   }
 
@@ -60,7 +60,7 @@ router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
     if (body[field] !== undefined) updates[field] = body[field];
   }
 
-  if (updates.number !== undefined && !isValidE164NoPlus(updates.number)) {
+  if (updates.number !== undefined && !isValidPhoneNumber(updates.number)) {
     return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
   }
 

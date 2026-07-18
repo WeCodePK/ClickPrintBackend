@@ -1,0 +1,28 @@
+info:
+  name: Enable/Disable Printer (Shop)
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{host}}/api/printers/:shopId/:printerId/isDisabled"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+    - name: printerId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "isDisabled": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

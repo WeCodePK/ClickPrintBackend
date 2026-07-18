@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: "{{host}}/api/shops/:shopId/owners/:userId"
+  url: "{{host}}/api/owners/:shopId/:userId"
   params:
     - name: userId
       value: ""

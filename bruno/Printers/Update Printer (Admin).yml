@@ -1,0 +1,28 @@
+info:
+  name: Update Printer (Admin)
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{host}}/api/printers/:shopId/:printerId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+    - name: printerId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "name": "HP LaserJet"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

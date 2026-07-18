@@ -1,14 +1,14 @@
 info:
-  name: Delete Printer
+  name: Shop Events
   type: http
-  seq: 3
+  seq: 1
 
 http:
-  method: DELETE
-  url: "{{host}}/api/printers/:printerId"
+  method: GET
+  url: "{{host}}/api/events/:shopId"
   params:
-    - name: printerId
-      value: 6a53cd678a789a7d3cbaf252
+    - name: shopId
+      value: ""
       type: path
   auth: inherit
 

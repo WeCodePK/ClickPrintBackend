@@ -1,13 +1,13 @@
 info:
-  name: Appoint Admin (Admin)
+  name: Get Owners
   type: http
-  seq: 1
+  seq: 9
 
 http:
-  method: POST
-  url: "{{host}}/api/users/admins/:userId"
+  method: GET
+  url: "{{host}}/api/owners/:shopId"
   params:
-    - name: userId
+    - name: shopId
       value: ""
       type: path
   auth: inherit

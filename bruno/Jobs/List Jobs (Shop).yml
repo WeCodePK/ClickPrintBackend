@@ -1,15 +1,12 @@
 info:
-  name: Add Owner
+  name: List Jobs (Shop)
   type: http
-  seq: 9
+  seq: 3
 
 http:
-  method: POST
-  url: "{{host}}/api/shops/:shopId/owners/:userId"
+  method: GET
+  url: "{{host}}/api/jobs/shop/:shopId"
   params:
-    - name: userId
-      value: ""
-      type: path
     - name: shopId
       value: ""
       type: path

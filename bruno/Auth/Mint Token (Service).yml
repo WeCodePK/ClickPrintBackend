@@ -1,17 +1,22 @@
 info:
-  name: Impersonate Token (Service)
+  name: Mint Token (Service)
   type: http
   seq: 3
 
 http:
   method: POST
-  url: "{{host}}/api/auth/token"
+  url: "{{host}}/api/auth/mint"
   body:
     type: json
     data: |-
       {
-        "number": "923235400292"
+        "number": "923235400291"
       }
+  auth:
+    type: apikey
+    key: Authorization
+    value: ApiKey 8f050c20fafb6243300e239c93c4b6a2
+    placement: header
 
 runtime:
   scripts:

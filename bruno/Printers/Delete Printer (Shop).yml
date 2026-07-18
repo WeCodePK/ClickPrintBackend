@@ -1,13 +1,16 @@
 info:
-  name: List Services
+  name: Delete Printer (Shop)
   type: http
-  seq: 3
+  seq: 7
 
 http:
-  method: GET
-  url: "{{host}}/api/services/:shopId"
+  method: DELETE
+  url: "{{host}}/api/printers/:shopId/:printerId"
   params:
     - name: shopId
+      value: ""
+      type: path
+    - name: printerId
       value: ""
       type: path
   auth: inherit

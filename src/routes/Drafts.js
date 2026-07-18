@@ -8,6 +8,7 @@ const Shop = require('../models/Shop');
 const Price = require('../models/Price');
 const Draft = require('../models/Draft');
 
+const { isAdmin } = require('../func/auth');
 const { runSideEffects } = require('../func/jobs');
 const { calculateJobCost } = require('../func/cost');
 const { notifyShopOnJobsUpdate } = require('../func/sse');
@@ -17,10 +18,8 @@ const { resp, validateObjectIds } = require('../func/misc');
 
 router.post('/', async (req, res) => {
   const { files, shop } = req.body || {};
-
-  // TODO: validateObjectIds shop
   
-  if (shop && !await Shop.exists({ _id: shop })) {
+  if (shop && validateObjectIds.check(shop) && !await Shop.exists({ _id: shop })) {
     return resp(res, 400, 'shop does not exist');
   }
 
@@ -30,8 +29,6 @@ router.post('/', async (req, res) => {
     }
 
     for (const [index, file] of files.entries()) {
-      // TODO: validateObjectIds file.file
-
       if (!file.file || !await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
       }
@@ -47,25 +44,29 @@ router.post('/', async (req, res) => {
   return resp(res, 201, 'draft created', { draft });
 });
 
+// -------------------------------------------------------------------------- //
+
 router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), async (req, res) => {
+  const admin = await isAdmin(req.token.uid);
+
   if (req.params.draftId) {
-    console.log(req.params.draftId);
     const draft = await Draft.findById(req.params.draftId).populate(Draft.draftPopulate);
 
     if (!draft) return resp(res, 404, 'not found');
-    if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+    if (!admin && !draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
     return resp(res, 200, 'fetched draft', {draft});
   }
 
-  const drafts = await Draft.find({ createdBy: req.token.uid }).populate(Draft.draftPopulate);
+  const filter = admin ? {} : { createdBy: req.token.uid };
+  const drafts = await Draft.find(filter).populate(Draft.draftPopulate);
   return resp(res, 200, 'fetched all drafts', {drafts});
 });
 
+// -------------------------------------------------------------------------- //
+
 router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   const { files, shop } = req.body || {};
-
-  // TODO: validateObjectIds shop
 
   const draft = await Draft.findById(req.params.draftId);
 
@@ -77,7 +78,7 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
       return resp(res, 400, 'shop cannot be cleared');
     }
 
-    if (!await Shop.exists({ _id: shop })) {
+    if (!validateObjectIds.check(shop) || !await Shop.exists({ _id: shop })) {
       return resp(res, 400, 'shop does not exist');
     }
 
@@ -90,8 +91,6 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
     }
 
     for (const file of files) {
-      // TODO: validateObjectIds file.file
-
       if (!file.file || !await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
       }
@@ -108,11 +107,15 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   return resp(res, 200, 'draft updated', {draft});
 });
 
+// -------------------------------------------------------------------------- //
+
 router.delete('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   const draft = await Draft.findById(req.params.draftId);
 
   if (!draft) return resp(res, 404, 'not found');
-  if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+  if (!await isAdmin(req.token.uid) && !draft.createdBy.equals(req.token.uid)) {
+    return resp(res, 403, 'forbidden');
+  }
 
   await Draft.deleteOne(draft);
   return resp(res, 200, 'draft deleted');
@@ -156,6 +159,8 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
   await draft.save();
   return resp(res, 200, 'draft checked', {draft});
 });
+
+// -------------------------------------------------------------------------- //
 
 router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, next) => {
   const draft = await Draft.findById(req.params.draftId);

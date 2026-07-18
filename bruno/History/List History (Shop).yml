@@ -1,11 +1,11 @@
 info:
-  name: Get Owners
+  name: List History (Shop)
   type: http
-  seq: 9
+  seq: 2
 
 http:
   method: GET
-  url: "{{host}}/api/shops/:shopId/owners"
+  url: "{{host}}/api/history/shops/:shopId"
   params:
     - name: shopId
       value: ""

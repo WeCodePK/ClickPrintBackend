@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: "{{host}}/api/users/admins/:userId"
+  url: "{{host}}/api/admins/:userId"
   params:
     - name: userId
       value: ""

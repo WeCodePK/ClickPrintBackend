@@ -1,7 +1,7 @@
 info:
   name: System Health Check
   type: http
-  seq: 13
+  seq: 15
 
 http:
   method: GET

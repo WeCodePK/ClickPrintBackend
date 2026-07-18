@@ -1,11 +1,15 @@
 info:
-  name: Create Printer
+  name: Create Printer (Shop)
   type: http
-  seq: 1
+  seq: 4
 
 http:
   method: POST
-  url: "{{host}}/api/printers"
+  url: "{{host}}/api/printers/:shopId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
   body:
     type: json
     data: |-

@@ -1,11 +1,11 @@
 info:
-  name: Get Admins (Admin)
+  name: Drafts Stats (Admin)
   type: http
-  seq: 2
+  seq: 1
 
 http:
   method: GET
-  url: "{{host}}/api/users/admins"
+  url: "{{host}}/api/stats/drafts"
   auth: inherit
 
 settings:

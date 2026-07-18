@@ -5,8 +5,11 @@ info:
 
 http:
   method: DELETE
-  url: "{{host}}/api/services/:serviceId"
+  url: "{{host}}/api/services/:shopId/:serviceId"
   params:
+    - name: shopId
+      value: ""
+      type: path
     - name: serviceId
       value: 6a53d1cd64e5a3b32bbb7eb5
       type: path

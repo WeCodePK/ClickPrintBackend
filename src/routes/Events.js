@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
-const { resp } = require('../func/misc');
+const { ownsShops } = require('../func/auth');
 const { sseClients } = require('../func/sse');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/events', async (req, res) => {
-  if (!req.token.sid) return resp(res, 403, 'forbidden');
+router.get('/events/:shopId', ownsShops, async (req, res) => {
+  const { shopId } = req.params;
 
-  sseClients.set(req.token.sid, res);
+  sseClients.set(shopId, res);
 
   res.set({
     'Connection': 'keep-alive',
@@ -26,7 +26,7 @@ router.get('/events', async (req, res) => {
 
   req.on('close', async () => {
     clearInterval(ping);
-    sseClients.delete(req.token.sid);
+    sseClients.delete(shopId);
   });
 });
 

@@ -4,7 +4,7 @@ const router = express.Router();
 const Shop = require('../models/Shop');
 const File = require('../models/File');
 
-const { isAdmin, isAdmin } = require('../func/auth');
+const { isAdmin } = require('../func/auth');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -35,7 +35,7 @@ router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), asyn
     return resp(res, 200, 'fetched shop', { shop });
   }
 
-  const filter = isAdmin(req.token.uid) ? {} : { isDisabled: false };
+  const filter = (await isAdmin(req.token.uid)) ? {} : { isDisabled: false };
 
   return resp(res, 200, 'fetched shops', { shops: await Shop.find(filter) });
 });
@@ -43,7 +43,7 @@ router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), asyn
 // -------------------------------------------------------------------------- //
 
 router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
-  const isAdm = isAdmin(req.token.uid);
+  const isAdm = await isAdmin(req.token.uid);
   const isOwner = !!req.token.sid && req.token.sid === req.params.shopId;
 
   if (!isAdm && !isOwner) return resp(res, 403, 'forbidden');

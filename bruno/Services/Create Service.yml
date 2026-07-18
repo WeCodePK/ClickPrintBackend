@@ -5,7 +5,11 @@ info:
 
 http:
   method: POST
-  url: "{{host}}/api/services"
+  url: "{{host}}/api/services/:shopId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
   body:
     type: json
     data: |-

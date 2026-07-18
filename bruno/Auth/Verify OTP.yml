@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "code": "00000",
+        "code": "55164",
         "number": "{{number}}"
       }
 
