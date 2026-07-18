@@ -3,24 +3,16 @@ const router = express.Router();
 
 const User = require('../models/User');
 
-const { resp, validateObjectIds, isValidE164NoPlus } = require('../func/misc');
+const { isAdmin } = require('../func/auth');
+const { resp, validateObjectIds, isValidPhoneNumber } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
-// Every route in this router is admin-only, so the guard sits on the router
-// rather than being repeated in each handler.
-router.use((req, res, next) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-  return next();
-});
-
-// -------------------------------------------------------------------------- //
-
-router.post('/', async (req, res) => {
+router.post('/', isAdmin, async (req, res) => {
   const { name, number } = req.body || {};
 
   if (!number) return resp(res, 400, 'missing or invalid field(s) (number)');
-  if (!isValidE164NoPlus(number)) {
+  if (!isValidPhoneNumber(number)) {
     return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
   }
 
@@ -33,27 +25,44 @@ router.post('/', async (req, res) => {
   }
 });
 
+// -------------------------------------------------------------------------- //
+
 router.get('/{:userId}', validateObjectIds('userId', { allowEmpty: true }), async (req, res) => {
-  if (req.params.userId) {
-    const user = await User.findById(req.params.userId);
+  const { userId } = req.params;
+
+  if (userId) {
+    // Non-admins may only fetch their own record.
+    if (!isAdmin(req.token.uid) && userId !== req.token.uid) return resp(res, 403, 'forbidden');
+
+    const user = await User.findById(userId);
 
     if (!user) return resp(res, 404, 'not found');
     return resp(res, 200, 'fetched user', { user });
   }
 
+  if (!isAdmin(req.token.uid)) return resp(res, 403, 'forbidden');
   return resp(res, 200, 'fetched users', { users: await User.find() });
 });
 
-router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
-  const { name, number } = req.body || {};
+// -------------------------------------------------------------------------- //
 
-  if (number !== undefined && !isValidE164NoPlus(number)) {
-    return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
+router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
+  const isAdmin = isAdmin(req.token.uid);
+  const isSelf = req.params.userId === req.token.uid;
+
+  if (!isAdmin && !isSelf) return resp(res, 403, 'forbidden');
+
+  const allowed = isAdmin ? ['name', 'number'] : ['name'];
+
+  const body = req.body || {};
+  const updates = {};
+  for (const field of allowed) {
+    if (body[field] !== undefined) updates[field] = body[field];
   }
 
-  const updates = {};
-  if (name !== undefined) updates.name = name;
-  if (number !== undefined) updates.number = number;
+  if (updates.number !== undefined && !isValidPhoneNumber(updates.number)) {
+    return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
+  }
 
   try {
     const user = await User.findByIdAndUpdate(req.params.userId, updates, {
@@ -68,7 +77,9 @@ router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
   }
 });
 
-router.patch('/:userId/isDisabled', validateObjectIds('userId'), async (req, res) => {
+// -------------------------------------------------------------------------- //
+
+router.patch('/:userId/isDisabled', isAdmin, validateObjectIds('userId'), async (req, res) => {
   const { isDisabled } = req.body || {};
 
   if (typeof isDisabled !== 'boolean') {
@@ -83,6 +94,12 @@ router.patch('/:userId/isDisabled', validateObjectIds('userId'), async (req, res
 
   if (!user) return resp(res, 404, 'not found');
   return resp(res, 200, `user ${isDisabled ? 'disabled' : 'enabled'}`, { user });
+});
+
+// -------------------------------------------------------------------------- //
+
+router.delete('/:userId', isAdmin, validateObjectIds('userId'), async (req, res) => {
+  return resp(res, 501, 'not implemented yet');
 });
 
 // -------------------------------------------------------------------------- //

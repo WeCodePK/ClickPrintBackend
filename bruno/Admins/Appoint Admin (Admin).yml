@@ -1,16 +1,16 @@
 info:
-  name: Edit Profile
+  name: Appoint Admin (Admin)
   type: http
-  seq: 2
+  seq: 1
 
 http:
-  method: PATCH
-  url: "{{host}}/api/profile"
+  method: POST
+  url: "{{host}}/api/admins"
   body:
     type: json
     data: |-
       {
-        "name": "Abdul Ahad"
+        "user": ""
       }
   auth: inherit
 

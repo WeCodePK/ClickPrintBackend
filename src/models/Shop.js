@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const shopSchema = new mongoose.Schema({
 
   name: {
@@ -100,5 +101,9 @@ const shopSchema = new mongoose.Schema({
 }, { timestamps: false, versionKey: false, });
 
 const Shop = mongoose.model('Shop', shopSchema);
+
+Shop.shopPopulate = [
+  { path: 'imageFile', select: 'originalName' },
+];
 
 module.exports = Shop;

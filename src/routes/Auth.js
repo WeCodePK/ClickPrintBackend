@@ -1,23 +1,21 @@
+const { randomInt } = require('crypto');
 const jwt = require('jsonwebtoken');
 const express = require('express');
-const { randomInt } = require('crypto');
 const router = express.Router();
 
 const Otp = require('../models/Otp');
-const Shop = require('../models/Shop');
 const User = require('../models/User');
-const Admin = require('../models/Admin');
 
-const { keyAuth } = require('../func/auth');
-const { resp, sendViaNotifyBot, isValidE164NoPlus } = require('../func/misc');
+const { keyAuth, ownsShops, isAdmin } = require('../func/auth');
+const { resp, sendViaNotifyBot, isValidPhoneNumber } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
+const OTP_LENGTH = 5;
+const OTP_MAX_TRIES = 3;
+const JWT_EXPIRES_IN = '30d';
 const OTP_VALIDITY_MS = 5 * 60 * 1000; // 5 minutes
 const OTP_RESEND_COOLDOWN_MS = 30 * 1000; // 30 seconds
-const OTP_MAX_TRIES = 3;
-const OTP_LENGTH = 5;
-const JWT_EXPIRES_IN = '30d';
 
 function generateOtpCode(length) {
   let otp = `${randomInt(1, 10)}`;
@@ -29,10 +27,14 @@ function generateOtpCode(length) {
 // -------------------------------------------------------------------------- //
 
 router.post('/otp', async (req, res) => {
-  const { number, actor } = req.body || {};
+  const { number, intent } = req.body || {};
 
   if (!number) return resp(res, 400, `missing or empty field 'number'`);
-  if (!isValidE164NoPlus(number)) return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
+  if (!isValidPhoneNumber(number)) return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
+  if (!intent) return resp(res, 400, `missing or empty field 'intent'`);
+  if (!['user', 'shop', 'admin'].includes(intent)) {
+    return resp(res, 400, `field 'intent' must be one of 'user', 'shop', 'admin'`);
+  }
 
   // Rate-limit: check the existing OTP's lastSentAt independently of its expiry
   const existing = await Otp.findOne({ number }).lean();
@@ -40,14 +42,23 @@ router.post('/otp', async (req, res) => {
     return resp(res, 429, 'too many requests');
   }
 
-  if (actor == "shop") {
+  // For non-user intents, verify authorization up front so we don't send an OTP
+  // to someone who can't log in as a shop/admin anyway.
+  if (intent === 'shop' || intent === 'admin') {
     const user = await User.findOne({ number });
     if (!user) {
-      return resp(res, 404, 'No registered user found with this number');
+      return resp(res, 404, 'user does not exist');
     }
-    const shop = await Shop.findOne({ owner: user._id });
-    if (!shop) {
-      return resp(res, 404, 'No registered shop found for this user');
+
+    if (intent === 'shop') {
+      const shops = await ownsShops(user._id);
+      if (shops.length === 0) {
+        return resp(res, 403, 'user does not own any shops');
+      }
+    } else {
+      if (!(await isAdmin(user._id))) {
+        return resp(res, 403, 'user is not an admin');
+      }
     }
   }
 
@@ -70,6 +81,8 @@ router.post('/otp', async (req, res) => {
   await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
   return resp(res, 200, 'otp sent');
 });
+
+// -------------------------------------------------------------------------- //
 
 router.post('/verify', async (req, res) => {
   const { code, number } = req.body || {};
@@ -104,20 +117,24 @@ router.post('/verify', async (req, res) => {
     { upsert: true, returnDocument: 'after' }
   );
 
-  const shop = await Shop.findOne({ owner: user._id });
-  const admin = await Admin.findOne({ user: user._id });
+  const shops = await ownsShops(user._id);
 
-  const payload = { uid: user._id, isAdmin: !!admin };
-  if (shop) payload.sid = shop._id;
+  const token = jwt.sign(
+    { uid: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-  return resp(res, 200, 'otp verified', { token, profile: user, shop: shop || undefined });
+  return resp(res, 200, 'otp verified', { user, shops, token });
 });
 
-router.post('/token', keyAuth, async (req, res) => {
+// -------------------------------------------------------------------------- //
+
+router.post('/mint', keyAuth, async (req, res) => {
   const { number } = req.body || {};
+
   if (!number) return resp(res, 400, 'number is required');
+  if (!isValidPhoneNumber(number)) return resp(res, 400, `number must be in 92XXXXXXXXXX format`);
 
   const user = await User.findOneAndUpdate(
     { number },
@@ -125,8 +142,12 @@ router.post('/token', keyAuth, async (req, res) => {
     { upsert: true, returnDocument: 'after' }
   );
 
-  const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET);
-  return resp(res, 200, 'token created', { token });
+  const token = jwt.sign(
+    { uid: user._id },
+    process.env.JWT_SECRET
+  );
+
+  return resp(res, 200, 'minted token', { token });
 });
 
 // -------------------------------------------------------------------------- //

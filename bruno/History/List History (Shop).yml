@@ -1,14 +1,14 @@
 info:
-  name: Mark Shop As Online
+  name: List History (Shop)
   type: http
   seq: 2
 
 http:
-  method: PATCH
-  url: "{{host}}/api/shops/:shopId/isOnline"
+  method: GET
+  url: "{{host}}/api/history/shops/:shopId"
   params:
     - name: shopId
-      value: 6a3cded8705669a8f5981125
+      value: ""
       type: path
   auth: inherit
 

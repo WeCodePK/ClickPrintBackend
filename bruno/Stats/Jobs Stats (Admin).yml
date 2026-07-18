@@ -1,11 +1,11 @@
 info:
-  name: Safepay Raast Event
+  name: Jobs Stats (Admin)
   type: http
-  seq: 1
+  seq: 3
 
 http:
-  method: POST
-  url: "{{host}}/api/webhooks/safepay"
+  method: GET
+  url: "{{host}}/api/stats/jobs"
   auth: inherit
 
 settings:

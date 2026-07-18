@@ -1,21 +1,23 @@
 info:
-  name: Update User (Admin)
+  name: Update Printer (Admin)
   type: http
   seq: 5
 
 http:
   method: PUT
-  url: "{{host}}/api/users/:userId"
+  url: "{{host}}/api/printers/:shopId/:printerId"
   params:
-    - name: userId
-      value: 6a59ff9aa4f30684c49c0bb7
+    - name: shopId
+      value: ""
+      type: path
+    - name: printerId
+      value: ""
       type: path
   body:
     type: json
     data: |-
       {
-        "name": "Abdul Ahad",
-        "number": "923235400291"
+        "name": "HP LaserJet"
       }
   auth: inherit
 

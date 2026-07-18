@@ -5,30 +5,10 @@ const Topup = require('../models/Topup');
 const File = require('../models/File');
 const User = require('../models/User');
 
+const { isAdmin } = require('../func/auth');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
-
-router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), async (req, res) => {
-  let query = {};
-  if (!req.token.isAdmin) query = { createdBy: req.token.uid };
-
-  if (req.params.topupId) {
-    const topup = await Topup
-      .findOne({ _id: req.params.topupId, ...query })
-      .populate(Topup.filePopulate);
-
-    if (!topup) return resp(res, 404, 'not found');
-    return resp(res, 200, 'fetched topup', {topup});
-  }
-
-  const topups = await Topup
-    .find(query)
-    .populate(Topup.filePopulate)
-    .sort({ createdAt: -1 });
-
-  return resp(res, 200, 'fetched all topups', {topups});
-});
 
 router.post('/', async (req, res) => {
   const { amount, ppfid } = req.body || {};
@@ -56,11 +36,32 @@ router.post('/', async (req, res) => {
   return resp(res, 201, 'topup created', { topup });
 });
 
-// Admin-only: verify the payment proof out of band, then approve or decline a
-// pending topup. Approving credits the user's wallet by the topup amount.
-router.patch('/:topupId', validateObjectIds('topupId'), async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
+// -------------------------------------------------------------------------- //
 
+router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), async (req, res) => {
+  let query = {};
+  if (!isAdmin(req.token.uid)) query = { createdBy: req.token.uid };
+
+  if (req.params.topupId) {
+    const topup = await Topup
+      .findOne({ _id: req.params.topupId, ...query })
+      .populate(Topup.filePopulate);
+
+    if (!topup) return resp(res, 404, 'not found');
+    return resp(res, 200, 'fetched topup', {topup});
+  }
+
+  const topups = await Topup
+    .find(query)
+    .populate(Topup.filePopulate)
+    .sort({ createdAt: -1 });
+
+  return resp(res, 200, 'fetched all topups', {topups});
+});
+
+// -------------------------------------------------------------------------- //
+
+router.patch('/:topupId', isAdmin, validateObjectIds('topupId'), async (req, res) => {
   const { status } = req.body || {};
 
   if (status !== 'approved' && status !== 'declined') {

@@ -1,7 +1,7 @@
 info:
   name: Shops
   type: folder
-  seq: 10
+  seq: 11
 
 request:
   auth: inherit

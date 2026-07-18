@@ -1,7 +1,7 @@
 info:
   name: Update Job Status
   type: http
-  seq: 3
+  seq: 4
 
 http:
   method: PATCH

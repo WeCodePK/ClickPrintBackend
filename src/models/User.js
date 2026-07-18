@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { isValidPhoneNumber } = require('../func/misc');
 
 const userSchema = new mongoose.Schema({
 
@@ -15,8 +16,10 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Phone number is required'],
     unique: true,
     trim: true,
-    set: (v) => (typeof v === 'string' ? v.replace(/[\s\-()+]/g, '') : v),
-    match: [/^923\d{9}$/, 'Phone number must be in 92XXXXXXXXXX format (e.g. 923001234567)'],
+    validate: {
+      validator: isValidPhoneNumber,
+      message: 'Phone number must be in 92XXXXXXXXXX format (e.g. 923001234567)',
+    },
   },
 
   isDisabled: {

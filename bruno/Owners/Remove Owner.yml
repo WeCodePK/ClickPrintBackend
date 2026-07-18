@@ -1,14 +1,17 @@
 info:
-  name: Delete Printer
+  name: Remove Owner
   type: http
-  seq: 3
+  seq: 9
 
 http:
   method: DELETE
-  url: "{{host}}/api/printers/:printerId"
+  url: "{{host}}/api/owners/:shopId/:userId"
   params:
-    - name: printerId
-      value: 6a53cd678a789a7d3cbaf252
+    - name: userId
+      value: ""
+      type: path
+    - name: shopId
+      value: ""
       type: path
   auth: inherit
 

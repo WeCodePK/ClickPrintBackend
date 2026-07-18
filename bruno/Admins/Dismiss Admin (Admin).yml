@@ -1,14 +1,14 @@
 info:
-  name: Get Draft
+  name: Dismiss Admin (Admin)
   type: http
-  seq: 2
+  seq: 3
 
 http:
-  method: GET
-  url: "{{host}}/api/drafts/:draftId"
+  method: DELETE
+  url: "{{host}}/api/admins/:userId"
   params:
-    - name: draftId
-      value: 6a5b2fae35a74255d41459b1
+    - name: userId
+      value: ""
       type: path
   auth: inherit
 

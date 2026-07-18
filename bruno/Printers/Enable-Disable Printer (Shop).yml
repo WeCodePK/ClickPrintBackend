@@ -1,14 +1,17 @@
 info:
-  name: Enable/Disable User (Admin)
+  name: Enable/Disable Printer (Shop)
   type: http
   seq: 6
 
 http:
   method: PATCH
-  url: "{{host}}/api/users/:userId/isDisabled"
+  url: "{{host}}/api/printers/:shopId/:printerId/isDisabled"
   params:
-    - name: userId
-      value: 6a59ff9aa4f30684c49c0bb7
+    - name: shopId
+      value: ""
+      type: path
+    - name: printerId
+      value: ""
       type: path
   body:
     type: json

@@ -10,8 +10,8 @@ exports.resp = (res, code, message, data = {}) => {
   })
 };
 
-exports.isValidE164NoPlus = (number) => {
-  return /^[1-9]\d{7,14}$/.test(number);
+exports.isValidPhoneNumber = (number) => {
+  return typeof number === 'string' && /^923\d{9}$/.test(number);
 };
 
 exports.validateObjectIds = (...args) => (req, res, next) => {
@@ -39,6 +39,14 @@ exports.validateObjectIds = (...args) => (req, res, next) => {
   }
 
   next();
+};
+
+// Standalone counterpart to the validateObjectIds middleware: validate raw
+// id values directly. Returns true only if every supplied value is a valid
+// ObjectId. Call with one id or several — validateObjectIds.check(a, b, c).
+exports.validateObjectIds.check = (...ids) => {
+  if (ids.length === 0) return false;
+  return ids.every((id) => mongoose.isValidObjectId(id));
 };
 
 exports.sendViaNotifyBot = async (number, message) => {

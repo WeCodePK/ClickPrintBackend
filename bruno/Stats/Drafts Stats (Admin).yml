@@ -1,11 +1,11 @@
 info:
-  name: Server Side Events
+  name: Drafts Stats (Admin)
   type: http
   seq: 1
 
 http:
   method: GET
-  url: "{{host}}/api/events"
+  url: "{{host}}/api/stats/drafts"
   auth: inherit
 
 settings:

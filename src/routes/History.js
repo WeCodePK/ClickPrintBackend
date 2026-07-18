@@ -1,23 +1,34 @@
 const express = require('express');
 const router = express.Router();
 
-const { resp } = require('../func/misc');
 const History = require('../models/History');
+
+const { resp, validateObjectIds } = require('../func/misc');
+const { isAdmin, ownsShops } = require('../func/auth');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/', async (req, res) => {
+router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
+  const { uid } = req.token;
+  const { shopId } = req.params;
+
   let query;
 
-  if (!req.token.isAdmin) {
-    query = (req.token.sid)
-      ? { shop: req.token.sid }
-      : { createdBy: req.token.uid };
+  if (shopId) {
+    if (!(await ownsShops(uid, shopId)) && !(await isAdmin(uid))) {
+      return resp(res, 403, 'you do not own this shop');
+    }
+
+    query = { shop: shopId };
+  }
+  else if (await isAdmin(uid)) {
+    query = {};
+  }
+  else {
+    query = { createdBy: uid };
   }
 
-  const history = await History.find(query)
-    .populate(History.historyPopulate);
-
+  const history = await History.find(query).populate(History.historyPopulate);
   return resp(res, 200, 'fetched history', { history });
 });
 

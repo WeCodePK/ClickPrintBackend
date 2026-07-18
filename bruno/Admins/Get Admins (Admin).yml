@@ -1,11 +1,11 @@
 info:
-  name: List Printers
+  name: Get Admins (Admin)
   type: http
   seq: 2
 
 http:
   method: GET
-  url: "{{host}}/api/printers"
+  url: "{{host}}/api/admins"
   auth: inherit
 
 settings:

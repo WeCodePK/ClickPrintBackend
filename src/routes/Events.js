@@ -1,18 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
-const { resp } = require('../func/misc');
+const { ownsShops } = require('../func/auth');
 const { sseClients } = require('../func/sse');
-
-const Shop = require('../models/Shop');
-(async () => await Shop.updateMany({}, { $set: { isOnline: false } }))();
 
 // -------------------------------------------------------------------------- //
 
-router.get('/', async (req, res) => {
-  if (!req.token.sid) return resp(res, 403, 'forbidden');
+router.get('/events/:shopId', ownsShops, async (req, res) => {
+  const { shopId } = req.params;
 
-  sseClients.set(req.token.sid, res);
+  sseClients.set(shopId, res);
 
   res.set({
     'Connection': 'keep-alive',
@@ -24,20 +21,12 @@ router.get('/', async (req, res) => {
   res.write(`event: connected\ndata: \n\n`);
 
   const ping = setInterval(async () => {
-    const shop = await Shop.findById(req.token.sid);
-
-    if (shop.lastSeen < (Date.now() - 10000)) {
-      shop.isOnline = false;
-      await shop.save();
-    };
-
     res.write('event: ping\ndata: \n\n');
   }, 5000);
 
   req.on('close', async () => {
     clearInterval(ping);
-    sseClients.delete(req.token.sid);
-    await Shop.findByIdAndUpdate(req.token.sid, { isOnline: false });
+    sseClients.delete(shopId);
   });
 });
 

@@ -1,42 +1,55 @@
 const mongoose = require('mongoose');
 
-// TODO: add validations
-
 const topupSchema = new mongoose.Schema({
+
   status: {
     type: String,
     required: true,
-    enum: ['pending', 'approved', 'declined'],
+    default: 'pending',
+    enum: {
+      values: ['pending', 'approved', 'declined'],
+      message: '{VALUE} is not a valid status',
+    },
   },
+
   amount: {
     type: Number,
-    required: true,
-    validate: (v) => Number.isInteger(v) && v >= 10 && v % 10 === 0,
+    required: [true, 'Amount is required'],
+    validate: {
+      validator: (v) => Number.isInteger(v) && v >= 10 && v <= 100000 && v % 10 === 0,
+      message: 'Amount must be a whole number, a multiple of 10, between 10 and 100000',
+    },
   },
-  ppfid: {
+
+  paymentProofFile: {
     ref: 'File',
-    required: true,
+    required: [true, 'Payment proof is required'],
     type: String,
+    trim: true,
   },
+
   createdAt: {
     type: Date,
     required: true,
-    default: Date.now(),
+    default: Date.now,
+    validate: {
+      validator: (v) => v <= new Date(),
+      message: 'createdAt cannot be in the future',
+    },
   },
+
   createdBy: {
     ref: 'User',
-    required: true,
+    required: [true, 'Creator is required'],
     type: mongoose.Schema.Types.ObjectId,
   },
-}, {
-  timestamps: false,
-  versionKey: false,
-});
+
+}, { timestamps: false, versionKey: false, });
 
 const Topup = mongoose.model('Topup', topupSchema);
 
 Topup.filePopulate = [
-  { path: 'ppfid', select: 'originalName' },
+  { path: 'paymentProofFile', select: 'originalName' },
   { path: 'createdBy', select: 'name number' },
 ];
 

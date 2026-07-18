@@ -1,21 +1,15 @@
 info:
-  name: Approve/Decline Topup
+  name: Update Shop Status
   type: http
-  seq: 4
+  seq: 6
 
 http:
   method: PATCH
-  url: "{{host}}/api/topups/:topupId"
+  url: "{{host}}/api/shops/:shopId/status"
   params:
-    - name: topupId
+    - name: shopId
       value: ""
       type: path
-  body:
-    type: json
-    data: |-
-      {
-        "action": "approve"
-      }
   auth: inherit
 
 settings:

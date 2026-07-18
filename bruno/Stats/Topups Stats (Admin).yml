@@ -1,11 +1,11 @@
 info:
-  name: List Topups
+  name: Topups Stats (Admin)
   type: http
-  seq: 3
+  seq: 5
 
 http:
   method: GET
-  url: "{{host}}/api/topups"
+  url: "{{host}}/api/stats/topups"
   auth: inherit
 
 settings:

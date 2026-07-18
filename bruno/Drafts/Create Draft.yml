@@ -10,10 +10,10 @@ http:
     type: json
     data: |-
       {
-        "shop": "6a4634f80a91133201767bd0",
+        "shop": "6a59bb07132d651de75c66e5",
         "files": [
           {
-            "file": "6a4c73d1177044339075d0f1",
+            "file": "5a02dc03-98ef-4784-85c8-4551b9dec27e",
             "settings": {
               "color": true,
               "pageType": "A4",

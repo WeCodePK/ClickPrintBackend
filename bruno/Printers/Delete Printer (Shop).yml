@@ -1,14 +1,17 @@
 info:
-  name: Delete Shop (Admin)
+  name: Delete Printer (Shop)
   type: http
-  seq: 8
+  seq: 7
 
 http:
   method: DELETE
-  url: "{{host}}/api/shops/:shopId"
+  url: "{{host}}/api/printers/:shopId/:printerId"
   params:
     - name: shopId
-      value: 6a59bb07132d651de75c66e5
+      value: ""
+      type: path
+    - name: printerId
+      value: ""
       type: path
   auth: inherit
 

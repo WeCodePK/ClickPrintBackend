@@ -8,13 +8,13 @@ http:
   url: "{{host}}/api/users/:userId"
   params:
     - name: userId
-      value: ""
+      value: 6a59ff9aa4f30684c49c0bb7
       type: path
   body:
     type: json
     data: |-
       {
-        "name": "Abdul Ahad"
+        "name": "A Ahad"
       }
   auth: inherit
 

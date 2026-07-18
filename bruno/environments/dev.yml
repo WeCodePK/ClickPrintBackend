@@ -1,8 +1,0 @@
-name: dev
-variables:
-  - name: host
-    value: https://click-print-backend-dev.wckd.pk
-  - secret: true
-    name: token
-  - secret: true
-    name: number

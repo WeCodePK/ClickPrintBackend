@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "actor" : "user",
+        "intent": "user",
         "number": "923235400291"
       }
 

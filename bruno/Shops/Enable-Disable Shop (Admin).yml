@@ -1,7 +1,7 @@
 info:
   name: Enable/Disable Shop (Admin)
   type: http
-  seq: 6
+  seq: 7
 
 http:
   method: PATCH
