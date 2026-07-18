@@ -6,6 +6,7 @@ const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
 
+const { isAdmin } = require('../func/auth');
 const { notifyUserOnJobStatus } = require('../func/push');
 const { resp, validateObjectIds } = require('../func/misc');
 const { sseClients, notifyShopOnJobsUpdate } = require('../func/sse');
@@ -15,7 +16,7 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 
 router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async (req, res) => {
   let query;
-  if (!req.token.isAdmin) {
+  if (!isAdmin(req.token.uid)) {
     query = (req.token.sid) ? { shop: req.token.sid } : { createdBy: req.token.uid };
   }
 

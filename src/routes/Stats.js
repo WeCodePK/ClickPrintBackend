@@ -7,12 +7,11 @@ const Shop = require('../models/Shop');
 const Topup = require('../models/Topup');
 
 const { resp } = require('../func/misc');
+const { isAdmin } = require('../func/auth');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/shops', async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.get('/shops', isAdmin, async (req, res) => {
   // Disabled shops are their own bucket rather than being folded into offline,
   // so isOnline is only ever read for shops that are enabled. The three buckets
   // partition the shops and always sum to the total.
@@ -26,9 +25,7 @@ router.get('/shops', async (req, res) => {
   return resp(res, 200, 'fetched shop stats', { shops, online, offline, disabled });
 });
 
-router.get('/topups', async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.get('/topups', isAdmin, async (req, res) => {
   // The status enum has exactly these three values, so the buckets partition the
   // topups and always sum to the total.
   const [ topups, approved, declined, pending ] = await Promise.all([
@@ -41,9 +38,7 @@ router.get('/topups', async (req, res) => {
   return resp(res, 200, 'fetched topup stats', { topups, approved, declined, pending });
 });
 
-router.get('/users', async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.get('/users', isAdmin, async (req, res) => {
   // distinct() flattens array fields, so this holds if a shop gains many owners.
   const [ adminIds, ownerIds ] = await Promise.all([
     Admin.distinct('user'),

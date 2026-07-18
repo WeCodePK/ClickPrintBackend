@@ -3,13 +3,12 @@ const router = express.Router();
 
 const User = require('../models/User');
 
+const { isAdmin, isAdmin } = require('../func/auth');
 const { resp, validateObjectIds, isValidE164NoPlus } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
-router.post('/', async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.post('/', isAdmin, async (req, res) => {
   const { name, number } = req.body || {};
 
   if (!number) return resp(res, 400, 'missing or invalid field(s) (number)');
@@ -33,7 +32,7 @@ router.get('/{:userId}', validateObjectIds('userId', { allowEmpty: true }), asyn
 
   if (userId) {
     // Non-admins may only fetch their own record.
-    if (!req.token.isAdmin && userId !== req.token.uid) return resp(res, 403, 'forbidden');
+    if (!isAdmin(req.token.uid) && userId !== req.token.uid) return resp(res, 403, 'forbidden');
 
     const user = await User.findById(userId);
 
@@ -41,14 +40,14 @@ router.get('/{:userId}', validateObjectIds('userId', { allowEmpty: true }), asyn
     return resp(res, 200, 'fetched user', { user });
   }
 
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
+  if (!isAdmin(req.token.uid)) return resp(res, 403, 'forbidden');
   return resp(res, 200, 'fetched users', { users: await User.find() });
 });
 
 // -------------------------------------------------------------------------- //
 
 router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
-  const isAdmin = !!req.token.isAdmin;
+  const isAdmin = isAdmin(req.token.uid);
   const isSelf = req.params.userId === req.token.uid;
 
   if (!isAdmin && !isSelf) return resp(res, 403, 'forbidden');
@@ -80,9 +79,7 @@ router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
 
 // -------------------------------------------------------------------------- //
 
-router.patch('/:userId/isDisabled', validateObjectIds('userId'), async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.patch('/:userId/isDisabled', isAdmin, validateObjectIds('userId'), async (req, res) => {
   const { isDisabled } = req.body || {};
 
   if (typeof isDisabled !== 'boolean') {
@@ -101,9 +98,7 @@ router.patch('/:userId/isDisabled', validateObjectIds('userId'), async (req, res
 
 // -------------------------------------------------------------------------- //
 
-router.delete('/:userId', validateObjectIds('userId'), async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.delete('/:userId', isAdmin, validateObjectIds('userId'), async (req, res) => {
   return resp(res, 501, 'not implemented yet');
 });
 

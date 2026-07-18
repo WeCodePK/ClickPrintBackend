@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const { resp } = require('../func/misc');
+const { isAdmin } = require('../func/auth');
+
 const History = require('../models/History');
 
 // -------------------------------------------------------------------------- //
@@ -9,7 +11,7 @@ const History = require('../models/History');
 router.get('/', async (req, res) => {
   let query;
 
-  if (!req.token.isAdmin) {
+  if (!isAdmin(req.token.uid)) {
     query = (req.token.sid)
       ? { shop: req.token.sid }
       : { createdBy: req.token.uid };

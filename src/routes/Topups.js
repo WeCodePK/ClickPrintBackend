@@ -5,6 +5,7 @@ const Topup = require('../models/Topup');
 const File = require('../models/File');
 const User = require('../models/User');
 
+const { isAdmin } = require('../func/auth');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -39,7 +40,7 @@ router.post('/', async (req, res) => {
 
 router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), async (req, res) => {
   let query = {};
-  if (!req.token.isAdmin) query = { createdBy: req.token.uid };
+  if (!isAdmin(req.token.uid)) query = { createdBy: req.token.uid };
 
   if (req.params.topupId) {
     const topup = await Topup
@@ -60,9 +61,7 @@ router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), as
 
 // -------------------------------------------------------------------------- //
 
-router.patch('/:topupId', validateObjectIds('topupId'), async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
+router.patch('/:topupId', isAdmin, validateObjectIds('topupId'), async (req, res) => {
   const { status } = req.body || {};
 
   if (status !== 'approved' && status !== 'declined') {
