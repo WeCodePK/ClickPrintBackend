@@ -38,10 +38,12 @@ router.get('/drafts', isAdmin, async (req, res) => {
   const incomplete = drafts - ready - completeCount;
 
   return resp(res, 200, 'fetched draft stats', {
-    drafts,
-    ready,
-    complete: completeCount,
-    incomplete,
+    stats: {
+      drafts,
+      ready,
+      complete: completeCount,
+      incomplete,
+    },
   });
 });
 
@@ -57,7 +59,7 @@ router.get('/jobs', isAdmin, async (req, res) => {
     Job.countDocuments({ status: 'submitted' }),
   ]);
 
-  return resp(res, 200, 'fetched job stats', { jobs, printing, queued, submitted });
+  return resp(res, 200, 'fetched job stats', { stats: { jobs, printing, queued, submitted } });
 });
 
 router.get('/history', isAdmin, async (req, res) => {
@@ -71,7 +73,7 @@ router.get('/history', isAdmin, async (req, res) => {
     History.countDocuments({ status: 'completed' }),
   ]);
 
-  return resp(res, 200, 'fetched history stats', { jobs, cancelled, failed, completed });
+  return resp(res, 200, 'fetched history stats', { stats: { jobs, cancelled, failed, completed } });
 });
 
 router.get('/shops', isAdmin, async (req, res) => {
@@ -85,7 +87,7 @@ router.get('/shops', isAdmin, async (req, res) => {
     Shop.countDocuments({ isDisabled: true }),
   ]);
 
-  return resp(res, 200, 'fetched shop stats', { shops, online, offline, disabled });
+  return resp(res, 200, 'fetched shop stats', { stats: { shops, online, offline, disabled } });
 });
 
 router.get('/topups', isAdmin, async (req, res) => {
@@ -98,7 +100,7 @@ router.get('/topups', isAdmin, async (req, res) => {
     Topup.countDocuments({ status: 'pending' }),
   ]);
 
-  return resp(res, 200, 'fetched topup stats', { topups, approved, declined, pending });
+  return resp(res, 200, 'fetched topup stats', { stats: { topups, approved, declined, pending } });
 });
 
 router.get('/users', isAdmin, async (req, res) => {
@@ -118,7 +120,7 @@ router.get('/users', isAdmin, async (req, res) => {
     User.countDocuments({ _id: { $nin: [ ...adminIds, ...ownerIds ] } }),
   ]);
 
-  return resp(res, 200, 'fetched user stats', { users, admins, owners, appUsers });
+  return resp(res, 200, 'fetched user stats', { stats: { users, admins, owners, appUsers } });
 });
 
 // -------------------------------------------------------------------------- //
