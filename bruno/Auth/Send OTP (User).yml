@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "intent": "user",
-        "number": "923235400291"
+        "intent": "admin",
+        "number": "923369233904"
       }
 
 runtime:
