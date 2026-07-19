@@ -20,7 +20,7 @@ runtime:
       code: |-
         const reqBody = req.getBody();
         if (reqBody && reqBody.number)
-          bru.setEnvVar("number", reqBody.number);
+          bru.setVar("number", reqBody.number);
 
 settings:
   encodeUrl: true

@@ -1,5 +1,5 @@
 info:
-  name: List Jobs
+  name: List Jobs (User)
   type: http
   seq: 2
 

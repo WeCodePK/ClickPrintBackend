@@ -24,7 +24,7 @@ runtime:
       code: |-
         const data = res.getBody();
         if (data && data.success && data.data && data.data.token)
-          bru.setEnvVar("token", data.data.token);
+          bru.setVar("token", data.data.token);
 
 settings:
   encodeUrl: true

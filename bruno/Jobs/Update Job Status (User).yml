@@ -1,5 +1,5 @@
 info:
-  name: Update Job Status
+  name: Update Job Status (User)
   type: http
   seq: 4
 
@@ -8,7 +8,7 @@ http:
   url: "{{host}}/api/jobs/:jobId/status"
   params:
     - name: jobId
-      value: 6a4c73da177044339075d0f2
+      value: ""
       type: path
   body:
     type: json

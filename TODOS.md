@@ -21,10 +21,18 @@
 - ==change `originalName` to `name`==
 - ==change `createdAt` to `uploadedAt`==
 - ==downloads should be by original file name==
+- list the internal endpoints in bruno
 
 ## Owners
 - ==The endpoint DO not exist. Only exist in Bruno==
 - ==What to do about _id in owners? should endpoints use `ownerId` or `userId`??==
+
+## History
+- ==change `/api/history/:shopId` to `/api/history/shops/:shopId`==
+
+## Jobs
+- ==Add the handler for `/api/jobs/shops/:jobId`==
+ 
 ## Shops
 
 - ==There is currently NO endpoint to get list of all shops I own, only returned at login time from `/auth/otp/verify` as `data.shops`. What If I want updated list / refresh?==
@@ -38,4 +46,4 @@
 - Health check endpoint `/health` should report according to health of all sub-systems.
 - ==Update responses of middleware in auth.js==
 - ==Delete models/Price.js==
-- ==isOnline virtual on shop==
+- ==`isOnline` virtual on shop==
