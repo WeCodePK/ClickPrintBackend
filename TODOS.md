@@ -43,12 +43,12 @@
 
 ## Stats
 
-- ==All endpoints should return stats under `data.stats`==
+- [x] All endpoints should return stats under `data.stats`==
 
 ## Misc
 
 - Health check endpoint `/health` should report according to health of all sub-systems.
 - ==Update responses of middleware in auth.js==
-- ==Delete models/Price.js==
+- [x] Delete models/Price.js==
 - ==`isOnline` virtual on shop==
 - 

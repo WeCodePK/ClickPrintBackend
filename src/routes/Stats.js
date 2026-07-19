@@ -106,7 +106,7 @@ router.get('/topups', isAdmin, async (req, res) => {
 router.get('/users', isAdmin, async (req, res) => {
   // distinct() flattens array fields, so this holds if a shop gains many owners.
   const [ adminIds, ownerIds ] = await Promise.all([
-    Admin.distinct('user'),
+    Admin.distinct('_id'),
     Shop.distinct('owner'),
   ]);
 
