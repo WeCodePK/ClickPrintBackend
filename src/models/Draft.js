@@ -199,7 +199,7 @@ Draft.draftSchema = draftSchema;
 Draft.draftPopulate = [
   { path: 'shop', select: 'name' },
   { path: 'createdBy', select: 'name number' },
-  { path: 'files.file', select: 'originalName numberOfPages' }
+  { path: 'files.file', select: 'name numberOfPages' }
 ];
 
 module.exports = Draft;

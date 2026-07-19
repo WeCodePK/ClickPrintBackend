@@ -48,15 +48,15 @@ async function serveFile(req, res, prefix = '') {
     return resp(res, 404, 'File Not Found');
   }
 
-  // Downloads are always named after the file id. Converted print documents are
-  // PDFs; raw files keep their original extension so they open correctly.
-  let ext = '.pdf';
+  // Downloads use the stored file name. Temp files have no record yet, so they
+  // fall back to the file id with a .pdf extension.
+  let filename = `${fileId}.pdf`;
   if (!prefix) {
-    const record = await File.findById(fileId).select('originalName raw').lean();
-    if (record?.raw) ext = path.extname(record.originalName);
+    const record = await File.findById(fileId).select('name').lean();
+    if (record?.name) filename = record.name;
   }
 
-  res.setHeader('Content-Disposition', `inline; filename="${fileId}${ext}"`);
+  res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
 
   const readStream = fs.createReadStream(filePath);
   readStream.on('error', () => res.destroy());
@@ -91,17 +91,20 @@ router.put('/:fileId', keyAuth, async (req, res) => {
 router.post('/', jwtAuth, upload.single('file'), async (req, res) => {
   if (!req.file) return resp(res, 400, 'no file provided');
 
-  // Callers storing non-print files (e.g. generic uploads) can skip PDF
-  // conversion and metadata extraction to keep the raw file as-is.
-  const skipConversion = ['true', '1', 'yes', 'on'].includes(
-    String(req.body.skipConversion).toLowerCase()
-  );
+  // `convert` is mandatory and controls whether the file is converted to a PDF
+  // for printing. When false, the raw file is stored as-is (e.g. generic
+  // uploads) with no conversion or metadata extraction.
+  const convertRaw = String(req.body.convert).toLowerCase();
+  if (convertRaw !== 'true' && convertRaw !== 'false') {
+    return resp(res, 400, 'convert field is required and must be true or false');
+  }
+  const convert = convertRaw === 'true';
 
-  if (skipConversion) {
+  if (!convert) {
     const file = await File.create({
-      raw: true,
+      type: 'raw',
+      name: req.file.originalname,
       uploadedBy: req.token.uid,
-      originalName: req.file.originalname,
     });
 
     await file.populate('uploadedBy', 'name number');
@@ -150,9 +153,10 @@ router.post('/', jwtAuth, upload.single('file'), async (req, res) => {
   const metadata = Object.values(await response.json())[0];
 
   const file = await File.create({
+    type: 'pdf',
+    name: req.file.originalname,
     uploadedBy: req.token.uid,
     numberOfPages: metadata.PageCount,
-    originalName: req.file.originalname,
   })
 
   await file.populate('uploadedBy', 'name number');

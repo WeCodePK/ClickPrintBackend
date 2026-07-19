@@ -1,3 +1,6 @@
+
+==Update the MODELSSS==
+
 ## Admins
 - [x] The endpoint DO not exist. Only exist in Bruno
 - [x] What to do about _id in admin? should endpoints use `adminId` or `userId`??
@@ -11,29 +14,29 @@
 
 ## Drafts
 - [x] `PATCH /api/drafts/:draftId` now uses `PUT`
-- ==Draft endpoint should only accept type PDF files==
-- ==Update Drafts Check/Submit to use new Services and Balance==
+- [x] Draft endpoint should only accept type PDF files
+- [x] Update Drafts Check/Submit to use new Services and Balance==
 
 ## Files
-- ==remove `skipConversion`, add `convert`==
-- ==make it mandatory==
-- ==store type `raw` or `pdf` in collection, if pdf then must `numberOfPages`==
-- ==change `originalName` to `name`==
-- ==change `createdAt` to `uploadedAt`==
-- ==downloads should be by original file name==
-- list the internal endpoints in Bruno
+- [x] remove `skipConversion`, add `convert`
+- [x] make it mandatory
+- [x] store type `raw` or `pdf` in collection, if pdf then must `numberOfPages`
+- [x] change `originalName` to `name`
+- [x] change `createdAt` to `uploadedAt`
+- [x] downloads should be by original file name
+- [ ] list the internal endpoints in Bruno
 
 ## History
 - ==change `/api/history/:shopId` to `/api/history/shops/:shopId`==
 
 ## Jobs
 - ==Add the handler for `/api/jobs/shops/:jobId`==
-## Owners
+## ~~Owners~~
 - [x] The endpoint DO not exist. Only exist in Bruno
 - [x] What to do about _id in owners? should endpoints use `ownerId` or `userId`??
 
 ## Services
-- ==Needs the `shopId` update==
+- [x] Needs the `shopId` update==
 ## Shops
 
 - ==There is currently NO endpoint to get list of all shops I own, only returned at login time from `/auth/otp/verify` as `data.shops`. What If I want updated list / refresh?==
@@ -48,3 +51,4 @@
 - ==Update responses of middleware in auth.js==
 - ==Delete models/Price.js==
 - ==`isOnline` virtual on shop==
+- 

@@ -1,4 +1,4 @@
-// Flat fee added to every job, in the same currency unit as price rates.
+// Flat fee added to every job, in the same currency unit as service rates.
 const SERVICE_FEE = 10;
 
 // -------------------------------------------------------------------------- //
@@ -37,41 +37,38 @@ function countSelectedPages(selection, totalPages) {
 
 // Whether a file's sidedness setting means double-sided printing. Settings use
 // "none" for single-sided and "long" / "short" (edge binding) for double-sided;
-// prices express this as a boolean (double = true).
+// service keys express this as a boolean (double = true).
 function isDoubleSided(sidedness) {
   return !!sidedness && sidedness !== 'none';
 }
 
-// Normalizes a draft file's settings into the flat shape that price `keys`
-// are matched against. This bridges the naming differences between the two:
-// settings use `color`, prices use `colored`; settings express sidedness as a
-// string, prices express it as a boolean (double = true).
+// Normalizes a draft file's settings into the flat shape that a service's
+// `keys` are matched against. This bridges the naming differences between the
+// two: settings express sidedness as a string, service keys express it as a
+// boolean (double = true).
 function normalizeSettings(settings) {
   return {
     color: !!settings.color,
-    colored: !!settings.color,
     pageType: settings.pageType,
-    orientation: settings.orientation,
-    pagesPerSheet: settings.pagesPerSheet,
     sidedness: isDoubleSided(settings.sidedness),
   };
 }
 
-// A price applies to a file when every key it declares matches the file's
-// (normalized) settings. A price with no keys matches everything.
-function priceMatches(price, normalized) {
-  return Object.entries(price.keys || {}).every(([key, value]) => normalized[key] === value);
+// A service applies to a file when every key it declares matches the file's
+// (normalized) settings. A service with no keys matches everything.
+function serviceMatches(service, normalized) {
+  return Object.entries(service.keys || {}).every(([key, value]) => normalized[key] === value);
 }
 
-// Picks the price for a file: the most specific match (most keys) wins, with
+// Picks the service for a file: the most specific match (most keys) wins, with
 // the cheapest rate breaking ties. Throws when nothing matches, since a job
 // that cannot be priced should not be created.
-function selectPrice(prices, settings, fileIndex) {
+function selectService(services, settings, fileIndex) {
   const normalized = normalizeSettings(settings);
-  const matches = prices.filter(price => priceMatches(price, normalized));
+  const matches = services.filter(service => serviceMatches(service, normalized));
 
   if (matches.length === 0) {
-    throw new Error(`No matching price for file[${fileIndex}]`);
+    throw new Error(`No matching service for file[${fileIndex}]`);
   }
 
   matches.sort((a, b) =>
@@ -92,28 +89,28 @@ function sheetsPerCopy(selectedPages, settings) {
 
 // -------------------------------------------------------------------------- //
 
-// Builds the cost breakdown for a set of draft files against a shop's prices.
+// Builds the cost breakdown for a set of draft files against a shop's services.
 //
-//   files  - populated draft files: [{ file: { _id, originalName, numberOfPages }, settings }]
-//   prices - the shop's Price documents: [{ name, rate, keys }]
+//   files    - populated draft files: [{ file: { _id, name, numberOfPages }, settings }]
+//   services - the shop's Service documents: [{ name, rate, keys }]
 //
 // Returns { lines, extra, total } matching the draft `cost` sub schema:
 //   lines: [ [label, sheets, rate, amount], ... ]
 //   extra: [ [label, amount], ... ]
 //   total: number
-const calculateJobCost = (files, prices) => {
+const calculateJobCost = (files, services) => {
   const lines = files.map((file, index) => {
     const totalPages = file.file.numberOfPages;
     if (totalPages == null) {
       throw new Error(`Missing page count for file[${index}]`);
     }
 
-    const price = selectPrice(prices, file.settings, index);
+    const service = selectService(services, file.settings, index);
     const selectedPages = countSelectedPages(file.settings.pageSelection, totalPages);
     const sheets = sheetsPerCopy(selectedPages, file.settings) * (file.settings.numberOfCopies || 1);
-    const amount = sheets * price.rate;
+    const amount = sheets * service.rate;
 
-    return [price.name, sheets, price.rate, amount];
+    return [service.name, sheets, service.rate, amount];
   });
 
   const extra = [

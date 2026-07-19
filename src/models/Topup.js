@@ -49,7 +49,7 @@ const topupSchema = new mongoose.Schema({
 const Topup = mongoose.model('Topup', topupSchema);
 
 Topup.filePopulate = [
-  { path: 'paymentProofFile', select: 'originalName' },
+  { path: 'paymentProofFile', select: 'name' },
   { path: 'createdBy', select: 'name number' },
 ];
 

@@ -22,4 +22,4 @@
 - `GET /api/jobs` is now `GET /api/jobs/shops/:shopId` for shops. Old endpoint still remains for users and admins.
 
 - Printers got the `shopId` update
-- Services got the `shopId` update
+- Services got the `shopId` update, colored is color in keys

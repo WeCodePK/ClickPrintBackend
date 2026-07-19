@@ -5,7 +5,7 @@ info:
 
 http:
   method: PATCH
-  url: "{{host}}/api/services/:shopId/:serviceId"
+  url: "{{host}}/api/services/:shopId/:serviceId/isDisabled"
   params:
     - name: shopId
       value: ""
@@ -17,18 +17,7 @@ http:
     type: json
     data: |-
       {
-        "rate": 20,
-        "keys": {
-          "pageType": "A4",
-          "colored": true,
-          "sidedness": true
-        },
-        "printers": [
-          {
-            "useAuto": true,
-            "printer": "6a53cfbd1b2ef6b69478ca5e"
-          }
-        ]
+        "isDisabled": true
       }
   auth: inherit
 
