@@ -49,7 +49,7 @@ exports.isAdmin = async (arg, res, next) => {
       return false;
     }
 
-    const exists = await Admin.exists({ user: uid });
+    const exists = await Admin.exists({ _id: uid });
 
     if (isMiddleware) {
       return exists ? next() : resp(res, 403, 'you are not an admin');

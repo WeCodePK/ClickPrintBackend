@@ -1,6 +1,6 @@
 ## Admins
-- ==The endpoint DO not exist. Only exist in Bruno==
-- ==What to do about _id in admin? should endpoints use `adminId` or `userId`??==
+- [x] The endpoint DO not exist. Only exist in Bruno
+- [x] What to do about _id in admin? should endpoints use `adminId` or `userId`??
 ## Auth
 
 - OTP endpoints bugs on rate limits.
@@ -21,7 +21,7 @@
 - ==change `originalName` to `name`==
 - ==change `createdAt` to `uploadedAt`==
 - ==downloads should be by original file name==
-- list the internal endpoints in bruno
+- list the internal endpoints in Bruno
 
 ## History
 - ==change `/api/history/:shopId` to `/api/history/shops/:shopId`==
@@ -29,8 +29,8 @@
 ## Jobs
 - ==Add the handler for `/api/jobs/shops/:jobId`==
 ## Owners
-- ==The endpoint DO not exist. Only exist in Bruno==
-- ==What to do about _id in owners? should endpoints use `ownerId` or `userId`??==
+- [x] The endpoint DO not exist. Only exist in Bruno
+- [x] What to do about _id in owners? should endpoints use `ownerId` or `userId`??
 
 ## Services
 - ==Needs the `shopId` update==
