@@ -1,0 +1,21 @@
+info:
+  name: Create Admin (Admin)
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/admins"
+  body:
+    type: json
+    data: |-
+      {
+        "user": "6a59ff9aa4f30684c49c0bb7"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

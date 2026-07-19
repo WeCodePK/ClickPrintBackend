@@ -1,0 +1,25 @@
+info:
+  name: Create Owner (Shop)
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{host}}/api/owners/:shopId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "user": "6a59ff9aa4f30684c49c0bb7"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

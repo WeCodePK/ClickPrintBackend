@@ -1,0 +1,36 @@
+info:
+  name: Create Service (Shop)
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{host}}/api/services/:shopId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "rate": 20,
+        "keys": {
+          "pageType": "A4",
+          "colored": false,
+          "sidedness": false
+        },
+        "printers": [
+          {
+            "useAuto": true,
+            "printer": "6a53cfbd1b2ef6b69478ca5e"
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

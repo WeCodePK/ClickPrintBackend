@@ -6,7 +6,7 @@ const { sseClients } = require('../func/sse');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/events/:shopId', ownsShops, async (req, res) => {
+router.get('/:shopId', ownsShops, async (req, res) => {
   const { shopId } = req.params;
 
   sseClients.set(shopId, res);

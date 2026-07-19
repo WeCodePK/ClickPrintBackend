@@ -1,0 +1,22 @@
+info:
+  name: Delete Owner (Shop)
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{host}}/api/owners/:shopId/:userId"
+  params:
+    - name: userId
+      value: ""
+      type: path
+    - name: shopId
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

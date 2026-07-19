@@ -103,7 +103,7 @@ const shopSchema = new mongoose.Schema({
 const Shop = mongoose.model('Shop', shopSchema);
 
 Shop.shopPopulate = [
-  { path: 'imageFile', select: 'originalName' },
+  { path: 'imageFile', select: 'name' },
 ];
 
 module.exports = Shop;

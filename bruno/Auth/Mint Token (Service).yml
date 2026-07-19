@@ -15,7 +15,7 @@ http:
   auth:
     type: apikey
     key: Authorization
-    value: ApiKey 8f050c20fafb6243300e239c93c4b6a2
+    value: ApiKey {{SERVICE_KEY}}
     placement: header
 
 runtime:
@@ -24,7 +24,7 @@ runtime:
       code: |-
         const data = res.getBody();
         if (data && data.success && data.data && data.data.token)
-          bru.setEnvVar("token", data.data.token);
+          bru.setVar("token", data.data.token);
 
 settings:
   encodeUrl: true

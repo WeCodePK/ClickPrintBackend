@@ -1,0 +1,39 @@
+info:
+  name: Update Service (Shop)
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{host}}/api/services/:shopId/:serviceId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+    - name: serviceId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "rate": 20,
+        "keys": {
+          "pageType": "A4",
+          "colored": true,
+          "sidedness": true
+        },
+        "printers": [
+          {
+            "useAuto": true,
+            "printer": "6a53cfbd1b2ef6b69478ca5e"
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const adminSchema = new mongoose.Schema({
 
-  user: {
+  _id: {
     ref: 'User',
     required: [true, 'User is required'],
     type: mongoose.Schema.Types.ObjectId,
@@ -26,12 +26,10 @@ const adminSchema = new mongoose.Schema({
 
 }, { timestamps: false, versionKey: false });
 
-adminSchema.index({ user: 1 }, { unique: true });
-
 const Admin = mongoose.model('Admin', adminSchema);
 
 Admin.adminPopulate = [
-  { path: 'user', select: 'name number' },
+  { path: '_id', select: 'name number' },
   { path: 'appointedBy', select: 'name number' },
 ];
 

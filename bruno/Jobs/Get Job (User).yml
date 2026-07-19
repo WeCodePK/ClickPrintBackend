@@ -1,0 +1,23 @@
+info:
+  name: Get Job (User)
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{host}}/api/jobs/:jobId"
+  params:
+    - name: jobId
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  > Notes on Authorization
+  Only allows jobIds which belong to the user or the shop logged in

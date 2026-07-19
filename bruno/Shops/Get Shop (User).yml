@@ -1,0 +1,19 @@
+info:
+  name: Get Shop (User)
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{host}}/api/shops/:shopId"
+  params:
+    - name: shopId
+      value: 6a59bb07132d651de75c66e5
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

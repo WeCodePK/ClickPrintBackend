@@ -1,0 +1,19 @@
+info:
+  name: Check Draft (User)
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{host}}/api/drafts/:draftId/check"
+  params:
+    - name: draftId
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

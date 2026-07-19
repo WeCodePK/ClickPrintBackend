@@ -1,4 +1,5 @@
 name: prod
+color: "#B83D7F"
 variables:
   - name: host
     value: https://clickprintbackend.wckd.pk
@@ -6,3 +7,5 @@ variables:
     name: token
   - secret: true
     name: number
+  - secret: true
+    name: SERVICE_KEY

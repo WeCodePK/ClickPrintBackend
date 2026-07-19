@@ -1,0 +1,25 @@
+info:
+  name: Update Job Status (User)
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{host}}/api/jobs/:jobId/status"
+  params:
+    - name: jobId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "status": "cancelled"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

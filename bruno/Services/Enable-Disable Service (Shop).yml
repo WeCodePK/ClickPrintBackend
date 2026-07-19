@@ -1,0 +1,28 @@
+info:
+  name: Enable/Disable Service (Shop)
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{host}}/api/services/:shopId/:serviceId/isDisabled"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+    - name: serviceId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "isDisabled": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

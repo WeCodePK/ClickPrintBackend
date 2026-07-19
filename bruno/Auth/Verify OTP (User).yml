@@ -1,0 +1,29 @@
+info:
+  name: Verify OTP (User)
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/auth/verify"
+  body:
+    type: json
+    data: |-
+      {
+        "code": "14273",
+        "number": "{{number}}"
+      }
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const data = res.getBody();
+        if (data && data.success && data.data && data.data.token)
+          bru.setVar("token", data.data.token);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

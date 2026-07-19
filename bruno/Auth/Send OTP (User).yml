@@ -1,0 +1,29 @@
+info:
+  name: Send OTP (User)
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/auth/otp"
+  body:
+    type: json
+    data: |-
+      {
+        "intent": "user",
+        "number": "923235400291"
+      }
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const reqBody = req.getBody();
+        if (reqBody && reqBody.number)
+          bru.setVar("number", reqBody.number);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

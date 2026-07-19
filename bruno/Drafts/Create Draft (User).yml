@@ -1,0 +1,35 @@
+info:
+  name: Create Draft (User)
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{host}}/api/drafts"
+  body:
+    type: json
+    data: |-
+      {
+        "shop": "6a59bb07132d651de75c66e5",
+        "files": [
+          {
+            "file": "8deff07b-1f44-4ac7-b5c8-1978b60d53f4",
+            "settings": {
+              "color": true,
+              "pageType": "A4",
+              "pagesPerSheet": 1,
+              "numberOfCopies": 1,
+              "sidedness": "none",
+              "pageSelection": "",
+              "orientation": "portrait"
+            }
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
