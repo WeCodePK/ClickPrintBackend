@@ -1,7 +1,7 @@
 info:
-  name: Appoint Admin (Admin)
+  name: Create Admin (Admin)
   type: http
-  seq: 1
+  seq: 2
 
 http:
   method: POST

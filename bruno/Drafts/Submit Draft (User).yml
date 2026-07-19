@@ -1,13 +1,13 @@
 info:
-  name: Dismiss Admin (Admin)
+  name: Submit Draft (User)
   type: http
-  seq: 3
+  seq: 7
 
 http:
-  method: DELETE
-  url: "{{host}}/api/admins/:userId"
+  method: PATCH
+  url: "{{host}}/api/drafts/:draftId/submit"
   params:
-    - name: userId
+    - name: draftId
       value: ""
       type: path
   auth: inherit

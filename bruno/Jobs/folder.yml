@@ -1,7 +1,7 @@
 info:
   name: Jobs
   type: folder
-  seq: 6
+  seq: 7
 
 request:
   auth: inherit

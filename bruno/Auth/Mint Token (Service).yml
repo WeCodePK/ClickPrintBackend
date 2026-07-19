@@ -15,7 +15,7 @@ http:
   auth:
     type: apikey
     key: Authorization
-    value: ApiKey 8f050c20fafb6243300e239c93c4b6a2
+    value: ApiKey {{SERVICE_KEY}}
     placement: header
 
 runtime:

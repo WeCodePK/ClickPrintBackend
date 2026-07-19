@@ -1,11 +1,15 @@
 info:
-  name: Create Draft
+  name: Update Draft (User)
   type: http
-  seq: 1
+  seq: 4
 
 http:
-  method: POST
-  url: "{{host}}/api/drafts"
+  method: PUT
+  url: "{{host}}/api/drafts/:draftId"
+  params:
+    - name: draftId
+      value: ""
+      type: path
   body:
     type: json
     data: |-
@@ -13,7 +17,7 @@ http:
         "shop": "6a59bb07132d651de75c66e5",
         "files": [
           {
-            "file": "5a02dc03-98ef-4784-85c8-4551b9dec27e",
+            "file": "8deff07b-1f44-4ac7-b5c8-1978b60d53f4",
             "settings": {
               "color": true,
               "pageType": "A4",

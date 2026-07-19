@@ -1,7 +1,7 @@
 info:
-  name: Remove Owner
+  name: Delete Owner (Shop)
   type: http
-  seq: 9
+  seq: 4
 
 http:
   method: DELETE

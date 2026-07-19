@@ -1,14 +1,14 @@
 info:
-  name: Add Owner
+  name: Events (Shop)
   type: http
-  seq: 9
+  seq: 1
 
 http:
-  method: POST
-  url: "{{host}}/api/owners/:shopId"
+  method: GET
+  url: "{{host}}/api/events/:shopId"
   params:
     - name: shopId
-      value: ""
+      value: "123"
       type: path
   auth: inherit
 

@@ -1,5 +1,5 @@
 info:
-  name: Verify OTP
+  name: Verify OTP (User)
   type: http
   seq: 2
 
@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "code": "55164",
+        "code": "14273",
         "number": "{{number}}"
       }
 

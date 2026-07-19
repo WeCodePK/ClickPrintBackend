@@ -1,4 +1,5 @@
 name: local
+color: "#346AB2"
 variables:
   - name: host
     value: http://localhost:3000
@@ -6,3 +7,5 @@ variables:
     name: token
   - secret: true
     name: number
+  - secret: true
+    name: SERVICE_KEY

@@ -1,14 +1,14 @@
 info:
-  name: Check Draft
+  name: Delete Admin (Admin)
   type: http
-  seq: 6
+  seq: 3
 
 http:
-  method: PATCH
-  url: "{{host}}/api/drafts/:draftId/check"
+  method: DELETE
+  url: "{{host}}/api/admins/:userId"
   params:
-    - name: draftId
-      value: 6a5b2fae35a74255d41459b1
+    - name: userId
+      value: ""
       type: path
   auth: inherit
 

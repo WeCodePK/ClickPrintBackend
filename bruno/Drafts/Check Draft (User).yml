@@ -1,15 +1,16 @@
 info:
-  name: Download File
+  name: Check Draft (User)
   type: http
-  seq: 2
+  seq: 6
 
 http:
-  method: GET
-  url: "{{host}}/api/files/:fileId"
+  method: PATCH
+  url: "{{host}}/api/drafts/:draftId/check"
   params:
-    - name: fileId
+    - name: draftId
       value: ""
       type: path
+  auth: inherit
 
 settings:
   encodeUrl: true

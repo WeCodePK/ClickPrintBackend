@@ -1,5 +1,5 @@
 info:
-  name: Send OTP
+  name: Send OTP (User)
   type: http
   seq: 1
 

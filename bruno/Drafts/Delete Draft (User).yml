@@ -1,14 +1,14 @@
 info:
-  name: Submit Draft
+  name: Delete Draft (User)
   type: http
-  seq: 7
+  seq: 5
 
 http:
-  method: PATCH
-  url: "{{host}}/api/drafts/:draftId/submit"
+  method: DELETE
+  url: "{{host}}/api/drafts/:draftId"
   params:
     - name: draftId
-      value: 6a5b2fae35a74255d41459b1
+      value: ""
       type: path
   auth: inherit
 
