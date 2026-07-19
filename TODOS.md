@@ -10,7 +10,7 @@
 - Mint token endpoint should include user and shops like verify endpoint? depends on bot flow i suppose.
 
 ## Drafts
-- ==`PATCH /api/drafts/:draftId` now uses `PUT`==
+- [x] `PATCH /api/drafts/:draftId` now uses `PUT`
 - ==Draft endpoint should only accept type PDF files==
 - ==Update Drafts Check/Submit to use new Services and Balance==
 
