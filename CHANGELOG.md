@@ -20,3 +20,6 @@
 - `GET /api/history` is now `GET /api/history/shops/:shopId` for shops. Old endpoint still remains for users and admins.
 
 - `GET /api/jobs` is now `GET /api/jobs/shops/:shopId` for shops. Old endpoint still remains for users and admins.
+
+- Printers got the `shopId` update
+- Services got the `shopId` update

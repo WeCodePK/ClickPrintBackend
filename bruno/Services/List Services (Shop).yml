@@ -1,11 +1,15 @@
 info:
-  name: List Shops
+  name: List Services (Shop)
   type: http
-  seq: 3
+  seq: 2
 
 http:
   method: GET
-  url: "{{host}}/api/shops"
+  url: "{{host}}/api/services/:shopId"
+  params:
+    - name: shopId
+      value: ""
+      type: path
   auth: inherit
 
 settings:

@@ -1,17 +1,14 @@
 info:
-  name: Update Service
+  name: Create Service (Shop)
   type: http
   seq: 4
 
 http:
-  method: PUT
-  url: "{{host}}/api/services/:shopId/:serviceId"
+  method: POST
+  url: "{{host}}/api/services/:shopId"
   params:
     - name: shopId
       value: ""
-      type: path
-    - name: serviceId
-      value: 6a53d24864e5a3b32bbb7eb8
       type: path
   body:
     type: json
@@ -20,8 +17,8 @@ http:
         "rate": 20,
         "keys": {
           "pageType": "A4",
-          "colored": true,
-          "sidedness": true
+          "colored": false,
+          "sidedness": false
         },
         "printers": [
           {

@@ -23,16 +23,17 @@
 - ==downloads should be by original file name==
 - list the internal endpoints in bruno
 
-## Owners
-- ==The endpoint DO not exist. Only exist in Bruno==
-- ==What to do about _id in owners? should endpoints use `ownerId` or `userId`??==
-
 ## History
 - ==change `/api/history/:shopId` to `/api/history/shops/:shopId`==
 
 ## Jobs
 - ==Add the handler for `/api/jobs/shops/:jobId`==
- 
+## Owners
+- ==The endpoint DO not exist. Only exist in Bruno==
+- ==What to do about _id in owners? should endpoints use `ownerId` or `userId`??==
+
+## Services
+- ==Needs the `shopId` update==
 ## Shops
 
 - ==There is currently NO endpoint to get list of all shops I own, only returned at login time from `/auth/otp/verify` as `data.shops`. What If I want updated list / refresh?==
