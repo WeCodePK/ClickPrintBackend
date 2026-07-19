@@ -65,7 +65,7 @@ router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), as
 
 // -------------------------------------------------------------------------- //
 
-router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
+router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   const { files, shop } = req.body || {};
 
   const draft = await Draft.findById(req.params.draftId);
