@@ -14,7 +14,7 @@ http:
     type: json
     data: |-
       {
-        "name": "HP LaserJet"
+        "name": "HP LaserJet P2055dn"
       }
   auth: inherit
 
