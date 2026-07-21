@@ -10,16 +10,16 @@ http:
     type: json
     data: |-
       {
-        "shop": "6a59bb07132d651de75c66e5",
+        "shop": "6a5d945512722b1be6c0ca1f",
         "files": [
           {
-            "file": "8deff07b-1f44-4ac7-b5c8-1978b60d53f4",
+            "file": "58f91b59-2014-4ddd-968b-88ba9668cd1e",
             "settings": {
-              "color": true,
+              "color": false,
               "pageType": "A4",
               "pagesPerSheet": 1,
               "numberOfCopies": 1,
-              "sidedness": "none",
+              "sidedness": "long",
               "pageSelection": "",
               "orientation": "portrait"
             }

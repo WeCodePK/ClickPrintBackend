@@ -1,7 +1,7 @@
 info:
-  name: Printers
+  name: Flags
   type: folder
-  seq: 10
+  seq: 6
 
 request:
   auth: inherit
