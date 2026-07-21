@@ -105,23 +105,21 @@ const calculateJobCost = (files, services) => {
     const sheets = sheetsPerCopy(selectedPages, file.settings) * (file.settings.numberOfCopies || 1);
     const amount = sheets * service.rate;
 
-    // return [service.name, sheets, service.rate, amount];
     return {
       item: service.name,
       rate: service.rate,
       quantity: sheets,
       subtotal: amount
-    }
+    };
   });
 
-  // const extra = [
-  //   ['Service Fee', SERVICE_FEE],
-  // ];
   const extra = [
-    { item: 'Testing Fee', subtotal: 10 },
+    { item: 'Test Fee', subtotal: 10 }
   ];
 
   const total =
+    lines.reduce((sum, line) => sum + line.subtotal, 0) +
+    extra.reduce((sum, e) => sum + e.subtotal, 0);
     lines.reduce((sum, line) => sum + line.subtotal, 0) +
     extra.reduce((sum, e) => sum + e.subtotal, 0);
 

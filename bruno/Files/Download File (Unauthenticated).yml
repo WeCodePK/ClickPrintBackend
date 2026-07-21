@@ -1,16 +1,15 @@
 info:
-  name: List History (Shop)
+  name: Download File (Unauthenticated)
   type: http
   seq: 2
 
 http:
   method: GET
-  url: "{{host}}/api/history/shops/:shopId"
+  url: "{{host}}/api/files/:fileId"
   params:
-    - name: shopId
-      value: 6a5d945512722b1be6c0ca1f
+    - name: fileId
+      value: ""
       type: path
-  auth: inherit
 
 settings:
   encodeUrl: true
