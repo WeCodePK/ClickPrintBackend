@@ -11,24 +11,24 @@ const { resp, validateObjectIds } = require('../func/misc');
 // -------------------------------------------------------------------------- //
 
 router.post('/', async (req, res) => {
-  const { amount, ppfid } = req.body || {};
+  const { amount, paymentProofFile } = req.body || {};
 
   if (!Number.isInteger(amount) || amount < 10 || amount % 10 !== 0) {
     return resp(res, 400, 'amount must be an integer of at least 10 in multiples of 10');
   }
 
-  if (!ppfid) {
-    return resp(res, 400, 'missing or invalid fields (ppfid)');
+  if (!paymentProofFile) {
+    return resp(res, 400, 'missing or invalid fields (paymentProofFile)');
   }
 
-  if (!await File.exists({ _id: ppfid })) {
+  if (!await File.exists({ _id: paymentProofFile })) {
     return resp(res, 400, 'file does not exist');
   }
 
   const topup = await Topup.create({
     status: 'pending',
     amount,
-    ppfid,
+    paymentProofFile,
     createdBy: req.token.uid,
   });
 
