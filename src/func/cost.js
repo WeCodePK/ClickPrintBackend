@@ -120,6 +120,8 @@ const calculateJobCost = (files, services) => {
   const total =
     lines.reduce((sum, line) => sum + line.subtotal, 0) +
     extra.reduce((sum, e) => sum + e.subtotal, 0);
+    lines.reduce((sum, line) => sum + line.subtotal, 0) +
+    extra.reduce((sum, e) => sum + e.subtotal, 0);
 
   return { lines, extra, total };
 };
