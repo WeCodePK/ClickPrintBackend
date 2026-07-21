@@ -15,7 +15,7 @@
 ## Drafts
 - [x] `PATCH /api/drafts/:draftId` now uses `PUT`
 - [x] Draft endpoint should only accept type PDF files
-- [x] Update Drafts Check/Submit to use new Services and Balance==
+- [x] Update Drafts Check/Submit to use new Services and Balance
 
 ## Files
 - [x] remove `skipConversion`, add `convert`
@@ -27,7 +27,7 @@
 - [ ] list the internal endpoints in Bruno
 
 ## History
-- ==change `/api/history/:shopId` to `/api/history/shops/:shopId`==
+- [x] change `/api/history/:shopId` to `/api/history/shops/:shopId`
 
 ## Jobs
 - ==Add the handler for `/api/jobs/shops/:jobId`==
@@ -49,6 +49,6 @@
 
 - Health check endpoint `/health` should report according to health of all sub-systems.
 - ==Update responses of middleware in auth.js==
-- [x] Delete models/Price.js==
+- [x] Delete models/Price.js
 - ==`isOnline` virtual on shop==
 - 

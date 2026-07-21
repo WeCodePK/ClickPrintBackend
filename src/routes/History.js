@@ -8,7 +8,7 @@ const { isAdmin, ownsShops } = require('../func/auth');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
+router.get('/{shops/:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
   const { uid } = req.token;
   const { shopId } = req.params;
 

@@ -28,6 +28,12 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
 
+  balance: {
+    default: 0,
+    type: Number,
+    required: true
+  },  // TODO: remove
+
 }, { timestamps: false, versionKey: false, });
 
 const User = mongoose.model('User', userSchema);

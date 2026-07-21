@@ -1,8 +1,3 @@
-// Flat fee added to every job, in the same currency unit as service rates.
-const SERVICE_FEE = 10;
-
-// -------------------------------------------------------------------------- //
-
 // Counts how many pages a `pageSelection` string actually targets.
 // Accepts comma separated singles and ranges, e.g. "1,3,16-20,25".
 // Empty / "all" means every page. Out of range pages are clamped away and
@@ -110,16 +105,23 @@ const calculateJobCost = (files, services) => {
     const sheets = sheetsPerCopy(selectedPages, file.settings) * (file.settings.numberOfCopies || 1);
     const amount = sheets * service.rate;
 
-    return [service.name, sheets, service.rate, amount];
+    return {
+      item: service.name,
+      rate: service.rate,
+      quantity: sheets,
+      subtotal: amount
+    };
   });
 
   const extra = [
-    ['Service Fee', SERVICE_FEE],
+    { item: 'Test Fee', subtotal: 10 }
   ];
 
   const total =
-    lines.reduce((sum, [, , , amount]) => sum + amount, 0) +
-    extra.reduce((sum, [, amount]) => sum + amount, 0);
+    lines.reduce((sum, line) => sum + line.subtotal, 0) +
+    extra.reduce((sum, e) => sum + e.subtotal, 0);
+    lines.reduce((sum, line) => sum + line.subtotal, 0) +
+    extra.reduce((sum, e) => sum + e.subtotal, 0);
 
   return { lines, extra, total };
 };
