@@ -4,42 +4,42 @@ const settingsSchema = new mongoose.Schema({
 
   color: {
     type: Boolean,
-    required: true,
+    required: [true, 'Field `color` is required'],
   },
 
   pageType: {
     type: String,
-    required: true,
+    required: [true, 'Field `pageType` is required'],
     enum: {
       values: [ 'A4', 'A3', ],
-      message: '{VALUE} is not a supported page type',
+      message: '`{VALUE}` is not a valid value for field `pageType`',
     },
   },
 
   pagesPerSheet: {
     type: Number,
-    required: true,
+    required: [true, 'Field `pagesPerSheet` is required'],
     enum: {
       values: [1, 2, 4, 8, 16],
-      message: '{VALUE} is not a valid pages-per-sheet value',
+      message: '`{VALUE}` is not a valid value for field `pagesPerSheet`',
     },
   },
 
   orientation: {
     type: String,
-    required: true,
+    required: [true, 'Field `orientation` is required'],
     enum: {
       values: ['portrait', 'landscape'],
-      message: '{VALUE} is not a valid orientation',
+      message: '`{VALUE}` is not a valid value for field `orientation`',
     },
   },
 
   sidedness: {
     type: String,
-    required: true,
+    required: [true, 'Field `sidedness` is required'],
     enum: {
       values: ['none', 'long', 'short'],
-      message: '{VALUE} is not a valid sidedness',
+      message: '`{VALUE}` is not a valid value for field `sidedness`',
     },
   },
 
@@ -47,8 +47,8 @@ const settingsSchema = new mongoose.Schema({
     type: Number,
     required: true,
     validate: {
-      validator: (v) => Number.isInteger(v) && v >= 1 && v <= 1000,
-      message: 'Number of copies must be a whole number between 1 and 1000',
+      validator: (v) => Number.isInteger(v) && v >= 1 && v <= 100,
+      message: 'Field `numberOfCopies` must be a whole number between 1 and 100',
     },
   },
 
@@ -58,7 +58,7 @@ const settingsSchema = new mongoose.Schema({
     trim: true,
     validate: {
       validator: (v) => v === '' || /^\d+(-\d+)?(,\s*\d+(-\d+)?)*$/.test(v),
-      message: 'Page selection must look like "1-5", "2,4,7" or "1-3,8,11-13"',
+      message: 'Field `pageSelection` must look like "1-5", "2,4,7" or "1-3,8,11-13"',
     },
   },
 
@@ -69,7 +69,7 @@ const fileSchema = new mongoose.Schema({
   file: {
     ref: 'File',
     type: String,
-    required: [true, 'File reference is required'],
+    required: [true, 'Field `file` is required'],
   },
 
   settings: {
@@ -83,36 +83,36 @@ const costLineSchema = new mongoose.Schema({
 
   item: {
     type: String,
-    required: [true, 'Line item name is required'],
+    required: [true, 'Field `item` is required'],
     trim: true,
-    minlength: [1, 'Line item name cannot be empty'],
-    maxlength: [100, 'Line item name cannot exceed 100 characters'],
+    minlength: [1, 'Field `name` can not be empty'],
+    maxlength: [50, 'Field `name` cannot exceed 50 characters'],
   },
 
   rate: {
     type: Number,
-    required: [true, 'Rate is required'],
+    required: [true, 'Field `rate` is required'],
     validate: {
       validator: (v) => Number.isFinite(v) && v >= 0,
-      message: 'Rate must be a non-negative number',
+      message: 'Field `rate` must be a non-negative number',
     },
   },
 
   quantity: {
     type: Number,
-    required: [true, 'Quantity is required'],
+    required: [true, 'Field `quantity` is required'],
     validate: {
       validator: (v) => Number.isInteger(v) && v >= 1,
-      message: 'Quantity must be a whole number of at least 1',
+      message: 'Field `quantity` must be a whole number of at least 1',
     },
   },
 
   subtotal: {
     type: Number,
-    required: [true, 'Subtotal is required'],
+    required: [true, 'Field `subtotal` is required'],
     validate: {
       validator: (v) => Number.isFinite(v) && v >= 0,
-      message: 'Subtotal must be a non-negative number',
+      message: 'Field `subtotal` must be a non-negative number',
     },
   },
 
@@ -122,33 +122,24 @@ const costExtraSchema = new mongoose.Schema({
 
   item: {
     type: String,
-    required: [true, 'Extra item name is required'],
+    required: [true, 'Field `item` is required'],
     trim: true,
-    minlength: [1, 'Extra item name cannot be empty'],
-    maxlength: [100, 'Extra item name cannot exceed 100 characters'],
+    minlength: [1, 'Field `name` can not be empty'],
+    maxlength: [50, 'Field `name` cannot exceed 50 characters'],
   },
 
   subtotal: {
     type: Number,
-    required: [true, 'Subtotal is required'],
+    required: [true, 'Field `subtotal` is required'],
     validate: {
-      validator: (v) => Number.isFinite(v),
-      message: 'Subtotal must be a valid number',
+      validator: (v) => Number.isFinite(v) && v >= 0,
+      message: 'Field `subtotal` must be a non-negative number',
     },
   },
 
 }, { _id: false, timestamps: false, versionKey: false, });
 
 const costSchema = new mongoose.Schema({
-
-  total: {
-    type: Number,
-    required: true,
-    validate: {
-      validator: (v) => Number.isFinite(v) && v >= 0,
-      message: 'Total must be a non-negative number',
-    },
-  },
 
   lines: {
     default: [],
@@ -160,23 +151,27 @@ const costSchema = new mongoose.Schema({
     type: [costExtraSchema],
   },
 
+  total: {
+    type: Number,
+    required: [true, 'Field `total` is required'],
+    validate: {
+      validator: (v) => Number.isFinite(v) && v >= 0,
+      message: 'Field `total` must be a non-negative number',
+    },
+  },
+
 }, { _id: false, timestamps: false, versionKey: false, });
 
 const draftSchema = new mongoose.Schema({
 
   files: {
-    required: false,
     default: [],
+    required: false,
     type: [fileSchema],
     validate: {
       validator: (v) => !Array.isArray(v) || v.length <= 50,
-      message: 'A draft cannot contain more than 50 files',
+      message: 'Field `files` can not contain more than 50 files',
     },
-  },
-
-  cost: {
-    required: false,
-    type: costSchema,
   },
 
   shop: {
@@ -185,10 +180,15 @@ const draftSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
   },
 
+  cost: {
+    required: false,
+    type: costSchema,
+  },
+
   createdBy: {
     ref: 'User',
-    required: [true, 'Creator is required'],
     type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `createdBy` is required'],
   },
 
 }, { timestamps: false, versionKey: false, });

@@ -4,25 +4,25 @@ const ownerSchema = new mongoose.Schema({
 
   user: {
     ref: 'User',
-    required: [true, 'User is required'],
     type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `user` is required'],
   },
 
   shop: {
     ref: 'Shop',
-    required: [true, 'Shop is required'],
     type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `shop` is required'],
   },
 
   appointedBy: {
     ref: 'User',
-    required: [true, 'Appointing user is required'],
     type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `appointedBy` is required'],
   },
 
   appointedByAdmin: {
     type: Boolean,
-    required: true,
+    required: [true, 'Field `appointedByAdmin` is required'],
   },
 
   appointedAt: {
@@ -31,7 +31,7 @@ const ownerSchema = new mongoose.Schema({
     default: () => new Date(),
     validate: {
       validator: (v) => v <= new Date(),
-      message: 'appointedAt cannot be in the future',
+      message: 'Field `appointedAt` can not be in the future',
     },
   },
 
@@ -42,8 +42,8 @@ ownerSchema.index({ user: 1, shop: 1 }, { unique: true });
 const Owner = mongoose.model('Owner', ownerSchema);
 
 Owner.ownerPopulate = [
-  { path: 'user', select: 'name number' },
   { path: 'shop', select: 'name' },
+  { path: 'user', select: 'name number' },
   { path: 'appointedBy', select: 'name number' },
 ];
 

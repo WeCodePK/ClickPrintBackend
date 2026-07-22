@@ -1,19 +1,29 @@
 const mongoose = require('mongoose');
 
+const validatePrinterName = (v) => {
+  if (/[\x00-\x1f]/.test(v)) return false;  // no control chars
+  if (/[\\!,]/.test(v)) return false;       // chars Windows disallows in printer names
+  return true;
+};
+
 const printerSchema = new mongoose.Schema({
 
   name: {
     type: String,
-    required: [true, 'Printer name is required'],
+    required: [true, 'Field `name` is required'],
     trim: true,
-    minlength: [1, 'Printer name cannot be empty'],
-    maxlength: [220, 'Printer name cannot exceed 220 characters'],
+    minlength: [1, 'Field `name` can not be empty'],
+    maxlength: [220, 'Field `name` can not exceed 220 characters'],
+    validate: {
+      validator: validatePrinterName,
+      message: 'Field `name` contains invalid characters',
+    },
   },
 
-  isDisabled: {
-    type: Boolean,
-    required: true,
-    default: false,
+  shop: {
+    ref: 'Shop',
+    type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `shop` is required'],
   },
 
   lastSeen: {
@@ -22,17 +32,23 @@ const printerSchema = new mongoose.Schema({
     default: () => new Date(0),
     validate: {
       validator: (v) => v <= new Date(),
-      message: 'lastSeen cannot be in the future',
+      message: 'Field `lastSeen` can not be in the future',
     },
   },
 
-  shop: {
-    ref: 'Shop',
-    required: [true, 'Shop is required'],
-    type: mongoose.Schema.Types.ObjectId,
+  isDisabled: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 
-}, { id: false, timestamps: false, versionKey: false, toJSON: { virtuals: true }, toObject: { virtuals: true }, });
+}, {
+  id: false,
+  timestamps: false,
+  versionKey: false,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+});
 
 printerSchema.index({ shop: 1, name: 1 }, { unique: true });
 

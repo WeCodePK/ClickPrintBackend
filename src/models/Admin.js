@@ -4,14 +4,14 @@ const adminSchema = new mongoose.Schema({
 
   _id: {
     ref: 'User',
-    required: [true, 'User is required'],
     type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `_id` is required'],
   },
 
   appointedBy: {
     ref: 'User',
-    required: [true, 'Appointing user is required'],
     type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `appointedBy` is required'],
   },
 
   appointedAt: {
@@ -20,7 +20,7 @@ const adminSchema = new mongoose.Schema({
     default: () => new Date(),
     validate: {
       validator: (v) => v <= new Date(),
-      message: 'appointedAt cannot be in the future',
+      message: 'Field `appointedAt` can not be in the future',
     },
   },
 

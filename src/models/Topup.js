@@ -8,40 +8,40 @@ const topupSchema = new mongoose.Schema({
     default: 'pending',
     enum: {
       values: ['pending', 'approved', 'declined'],
-      message: '{VALUE} is not a valid status',
+      message: '`{VALUE}` is not a valid value for field `status`',
     },
   },
 
   amount: {
     type: Number,
-    required: [true, 'Amount is required'],
+    required: [true, 'Field `amount` is required'],
     validate: {
-      validator: (v) => Number.isInteger(v) && v >= 10 && v <= 100000 && v % 10 === 0,
-      message: 'Amount must be a whole number, a multiple of 10, between 10 and 100000',
+      validator: (v) => Number.isInteger(v) && v >= 10 && v <= 1000 && v % 10 === 0,
+      message: 'Field `amount` must be a whole number, a multiple of 10, between 10 and 1000',
     },
   },
 
   paymentProofFile: {
     ref: 'File',
-    required: [true, 'Payment proof is required'],
-    type: String,
     trim: true,
+    type: String,
+    required: [true, 'Field `paymentProofFile` is required'],
+  },
+
+  createdBy: {
+    ref: 'User',
+    type: mongoose.Schema.Types.ObjectId,
+    required: [true, 'Field `createdBy` is required'],
   },
 
   createdAt: {
     type: Date,
     required: true,
-    default: Date.now,
+    default: () => new Date(),
     validate: {
       validator: (v) => v <= new Date(),
-      message: 'createdAt cannot be in the future',
+      message: 'Field `createdAt` can not be in the future',
     },
-  },
-
-  createdBy: {
-    ref: 'User',
-    required: [true, 'Creator is required'],
-    type: mongoose.Schema.Types.ObjectId,
   },
 
 }, { timestamps: false, versionKey: false, });
@@ -49,8 +49,8 @@ const topupSchema = new mongoose.Schema({
 const Topup = mongoose.model('Topup', topupSchema);
 
 Topup.filePopulate = [
-  { path: 'paymentProofFile', select: 'name' },
   { path: 'createdBy', select: 'name number' },
+  { path: 'paymentProofFile', select: 'name' },
 ];
 
 module.exports = Topup;
