@@ -1,0 +1,7 @@
+- Support Expo and Web Push Tokens
+- New Wallet + Transactions system + Balance in Paisa
+- Ability to define commision rates per shop/service/dynamic
+- Transfer to user functionality (once raast is functional)
+- Add on services
+- Dynamic Flags/Config management
+- 

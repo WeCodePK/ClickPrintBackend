@@ -1,0 +1,28 @@
+{
+	"nodes":[
+		{"id":"0464faf935804af7","type":"text","text":"# User","x":-540,"y":-90,"width":100,"height":60,"color":"4"},
+		{"id":"c110e7127bd311c7","type":"text","text":"# File","x":-540,"y":110,"width":105,"height":60,"color":"3"},
+		{"id":"c6e929352a1d0bba","type":"text","text":"# Owner","x":-240,"y":-90,"width":125,"height":60,"color":"3"},
+		{"id":"35e2762284e1514a","type":"text","text":"# Admin","x":-552,"y":-300,"width":125,"height":60,"color":"3"},
+		{"id":"590b91ee51f1255b","type":"text","text":"# Shop","x":-240,"y":110,"width":125,"height":60,"color":"3"},
+		{"id":"1a72b7909e1e3a65","type":"text","text":"# Printer","x":-251,"y":300,"width":147,"height":60,"color":"3"},
+		{"id":"ae10b9d46fa57385","type":"text","text":"# Service","x":100,"y":110,"width":137,"height":60,"color":"3"},
+		{"id":"cc9282eac2699e90","type":"text","text":"# Draft","x":-547,"y":300,"width":120,"height":60,"color":"3"},
+		{"id":"d3ec9b7814732536","type":"text","text":"# Topup","x":-940,"y":-90,"width":125,"height":60,"color":"3"}
+	],
+	"edges":[
+		{"id":"849d4f98fa091869","fromNode":"35e2762284e1514a","fromSide":"bottom","toNode":"0464faf935804af7","toSide":"top","label":"name, number"},
+		{"id":"d11e694116f763be","fromNode":"c6e929352a1d0bba","fromSide":"left","toNode":"0464faf935804af7","toSide":"right","label":"name, number"},
+		{"id":"9e6767754579e05f","fromNode":"c6e929352a1d0bba","fromSide":"bottom","toNode":"590b91ee51f1255b","toSide":"top","label":"name"},
+		{"id":"ed1116692f757e8a","fromNode":"590b91ee51f1255b","fromSide":"left","toNode":"c110e7127bd311c7","toSide":"right","label":"name"},
+		{"id":"5d4fe56035e6e152","fromNode":"c110e7127bd311c7","fromSide":"top","toNode":"0464faf935804af7","toSide":"bottom","label":"name"},
+		{"id":"b25bbda958847f15","fromNode":"d3ec9b7814732536","fromSide":"right","toNode":"0464faf935804af7","toSide":"left","label":"name, number"},
+		{"id":"2d8cb77834ed2f96","fromNode":"1a72b7909e1e3a65","fromSide":"top","toNode":"590b91ee51f1255b","toSide":"bottom","label":"name"},
+		{"id":"2608f52f9bb19369","fromNode":"ae10b9d46fa57385","fromSide":"left","toNode":"590b91ee51f1255b","toSide":"right","label":"name"},
+		{"id":"9b42e415ef1894d4","fromNode":"ae10b9d46fa57385","fromSide":"left","toNode":"1a72b7909e1e3a65","toSide":"right","label":"name"},
+		{"id":"d754cae6dee61766","fromNode":"d3ec9b7814732536","fromSide":"bottom","toNode":"c110e7127bd311c7","toSide":"left","label":"name"},
+		{"id":"50941c8d5d250caf","fromNode":"cc9282eac2699e90","fromSide":"right","toNode":"590b91ee51f1255b","toSide":"left","label":"name"},
+		{"id":"039530c75b339280","fromNode":"cc9282eac2699e90","fromSide":"top","toNode":"c110e7127bd311c7","toSide":"bottom","label":"name, numberOfPages"},
+		{"id":"efcee04a163706f3","fromNode":"cc9282eac2699e90","fromSide":"left","toNode":"0464faf935804af7","toSide":"left","label":"name"}
+	]
+}
