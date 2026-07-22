@@ -1,7 +1,6 @@
 const cors = require('cors');
 const morgan = require('morgan');
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
 const { resp } = require('./func/misc');
@@ -15,10 +14,6 @@ app.set('trust proxy', true);
 
 // -------------------------------------------------------------------------- //
 
-app.use(express.json({
-  verify: (req, res, buf) => req.rawBody = buf
-}));
-
 app.use(morgan('combined', {
   skip: (req, res) => req.path === '/health'
 }));
@@ -29,6 +24,17 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }));
 
+app.use(express.json({
+  limit: '100kb',
+  verify: (req, res, buf) => { req.rawBody = buf; }
+}));
+
+app.use((req, res, next) => {
+  if (req.is('application/json') === false) {
+    return resp(res, 415, 'Content-Type must be application/json');
+  }
+  next();
+});
 
 // -------------------------------------------------------------------------- //
 
@@ -61,6 +67,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // -------------------------------------------------------------------------- //
 
+// TODO update
 // Return 200 if MongoDB is reachable, 503 otherwise
 app.get('/health', async (req, res) => {
   try {
@@ -92,7 +99,29 @@ app.use('/api/users',     jwtAuth,  require('./routes/Users.js'));
 
 // -------------------------------------------------------------------------- //
 
+app.use((req, res) => resp(res, 404, 'Not found'));
+
+// -------------------------------------------------------------------------- //
+
 app.use((err, req, res, next) => {
+  if (err.expose && err.statusCode >= 400 && err.statusCode < 500) {
+    return resp(res, err.statusCode, err.message);
+  }
+
+  if (err.name === 'ValidationError') {
+    const [firstError] = Object.values(err.errors);
+    return resp(res, 400, firstError.message);
+  }
+
+  if (err.name === 'CastError') {
+    return resp(res, 400, `Field '${err.path}' has an invalid value`);
+  }
+
+  if (err.code === 11000) {
+    const [field, value] = Object.entries(err.keyValue || {})[0] || [];
+    return resp(res, 409, `A record with '${field}' = '${value}' already exists`);
+  }
+
   console.error('[ERROR]', err);
   resp(res, 500, 'Internal Server Error');
 });
@@ -124,5 +153,12 @@ const gracefulShutdown = async (server) => {
   }
 };
 
+// -------------------------------------------------------------------------- //
+
 process.on('SIGINT', () => gracefulShutdown(server));
 process.on('SIGTERM', () => gracefulShutdown(server));
+
+process.on('unhandledRejection', (err) => {
+  console.error('[ERROR] Unhandled rejection:', err);
+  gracefulShutdown(server);
+});

@@ -11,37 +11,32 @@ const { resp, validateObjectIds, isValidPhoneNumber } = require('../func/misc');
 router.post('/', isAdmin, async (req, res) => {
   const { name, number } = req.body || {};
 
-  if (!number) return resp(res, 400, 'missing or invalid field(s) (number)');
-  if (!isValidPhoneNumber(number)) {
-    return resp(res, 400, `field 'number' is not in valid E164 format (without the +)`);
-  }
+  const user = await User.create({ name, number });
 
-  try {
-    const user = await User.create({ number, ...(name !== undefined && { name }) });
-    return resp(res, 201, 'created user', { user });
-  } catch (err) {
-    if (err.code === 11000) return resp(res, 409, 'a user with this number already exists');
-    throw err;
-  }
+  return resp(res, 201, 'Created user', { user });
 });
 
 // -------------------------------------------------------------------------- //
 
 router.get('/{:userId}', validateObjectIds('userId', { allowEmpty: true }), async (req, res) => {
   const { userId } = req.params;
+  const isAdm = await isAdmin(req.token.uid);
 
   if (userId) {
-    // Non-admins may only fetch their own record.
-    if (!isAdmin(req.token.uid) && userId !== req.token.uid) return resp(res, 403, 'forbidden');
+    if (!isAdm && userId !== req.token.uid) {
+      return resp(res, 403, 'You can not view other users');
+    }
 
     const user = await User.findById(userId);
 
-    if (!user) return resp(res, 404, 'not found');
-    return resp(res, 200, 'fetched user', { user });
+    if (!user) return resp(res, 404, 'User does not exist');
+    return resp(res, 200, 'Fetched user', { user });
   }
 
-  if (!isAdmin(req.token.uid)) return resp(res, 403, 'forbidden');
-  return resp(res, 200, 'fetched users', { users: await User.find() });
+  if (!isAdm) return resp(res, 403, 'You are not an admin');
+
+  const users = await User.find();
+  return resp(res, 200, 'Fetched all users', { users });
 });
 
 // -------------------------------------------------------------------------- //
