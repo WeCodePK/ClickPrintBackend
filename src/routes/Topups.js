@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
 
 router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), async (req, res) => {
   let query = {};
-  if (!isAdmin(req.token.uid)) query = { createdBy: req.token.uid };
+  if (!(await isAdmin(req.token.uid))) query = { createdBy: req.token.uid };
 
   if (req.params.topupId) {
     const topup = await Topup

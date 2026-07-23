@@ -42,7 +42,7 @@ router.get('/{:userId}', validateObjectIds('userId', { allowEmpty: true }), asyn
 // -------------------------------------------------------------------------- //
 
 router.put('/:userId', validateObjectIds('userId'), async (req, res) => {
-  const isAdm = isAdmin(req.token.uid);
+  const isAdm = await isAdmin(req.token.uid);
   const isSelf = req.params.userId === req.token.uid;
 
   if (!isAdm && !isSelf) return resp(res, 403, 'forbidden');

@@ -16,7 +16,7 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 
 router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async (req, res) => {
   let query;
-  if (!isAdmin(req.token.uid)) {
+  if (!(await isAdmin(req.token.uid))) {
     query = (req.token.sid) ? { shop: req.token.sid } : { createdBy: req.token.uid };
   }
 
