@@ -28,8 +28,8 @@ router.get('/{:userId}', validateObjectIds('userId', { allowEmpty: true }), asyn
     }
 
     const user = await User.findById(userId);
-
     if (!user) return resp(res, 404, 'User does not exist');
+
     return resp(res, 200, 'Fetched user', { user });
   }
 
@@ -78,7 +78,7 @@ router.patch('/:userId/isDisabled', isAdmin, validateObjectIds('userId'), async 
   const { isDisabled } = req.body || {};
 
   if (typeof isDisabled !== 'boolean') {
-    return resp(res, 400, 'missing or invalid field(s) (isDisabled)');
+    return resp(res, 400, 'Field `isDisabled` must be a boolean');
   }
 
   const user = await User.findByIdAndUpdate(
@@ -87,14 +87,15 @@ router.patch('/:userId/isDisabled', isAdmin, validateObjectIds('userId'), async 
     { returnDocument: 'after' }
   );
 
-  if (!user) return resp(res, 404, 'not found');
-  return resp(res, 200, `user ${isDisabled ? 'disabled' : 'enabled'}`, { user });
+  if (!user) return resp(res, 404, 'User does not exist');
+  return resp(res, 200, 'Updated isDisabled', { user });
 });
 
 // -------------------------------------------------------------------------- //
 
 router.delete('/:userId', isAdmin, validateObjectIds('userId'), async (req, res) => {
-  return resp(res, 501, 'not implemented yet');
+  return resp(res, 501, 'Not Implemented Yet');
+  // TODO: handle cascade or only allow deletes of virgin users
 });
 
 // -------------------------------------------------------------------------- //
