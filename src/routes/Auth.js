@@ -16,7 +16,7 @@ const OTP_MAX_TRIES = 3;
 const JWT_EXPIRES_IN = '30d';
 const OTP_VALIDITY_MS = 5 * 60 * 1000; // 5 minutes
 const OTP_RESEND_COOLDOWN_MS = 30 * 1000; // 30 seconds
-
+ 
 function generateOtpCode(length) {
   let otp = `${randomInt(1, 10)}`;
   for (let i = 1; i < length; i++)
@@ -81,8 +81,8 @@ router.post('/otp', async (req, res) => {
   await sendViaSms(number, `[ClickPrint] Your OTP is: ${code}`);
   return resp(res, 200, 'otp sent', { 
     config: {
-      codeLength: 5,
-      resendInMs: 30000,
+      codeLength: OTP_LENGTH,
+      resendInMs: OTP_RESEND_COOLDOWN_MS,
     }
   });
 });
