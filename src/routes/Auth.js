@@ -7,7 +7,7 @@ const Otp = require('../models/Otp');
 const User = require('../models/User');
 
 const { keyAuth, ownsShops, isAdmin } = require('../func/auth');
-const { resp, sendViaNotifyBot, isValidPhoneNumber } = require('../func/misc');
+const { resp, sendViaSms, isValidPhoneNumber } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
@@ -78,7 +78,7 @@ router.post('/otp', async (req, res) => {
     { upsert: true, returnDocument: 'after' }
   );
 
-  await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
+  await sendViaSms(number, `[ClickPrint] Your login OTP is: ${code}`);
   return resp(res, 200, 'otp sent');
 });
 

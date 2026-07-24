@@ -36,7 +36,7 @@ const required = [
   'SERVICE_KEY',
   'EXPO_ACCESS_TOKEN',
   'MONGODB_URI',
-  'NOTIFYBOT_URL',
+  'SMSGATE_URL',
 ];
 
 process.env.GOTENBERG_URL = process.env.GOTENBERG_URL || 'http://gotenberg:3000';

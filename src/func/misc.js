@@ -49,15 +49,15 @@ exports.validateObjectIds.check = (...ids) => {
   return ids.every((id) => mongoose.isValidObjectId(id));
 };
 
-exports.sendViaNotifyBot = async (number, message) => {
-  return await fetch(process.env.NOTIFYBOT_URL, {
+exports.sendViaSms = async (number, message) => {
+  return await fetch(process.env.SMSGATE_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      chatId: `${number}@c.us`,
-      message
+      textMessage: { text: message },
+      phoneNumbers: [ `+${number}` ],
     })
   });
 };
