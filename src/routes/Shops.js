@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Shop = require('../models/Shop');
 const File = require('../models/File');
+const Printer = require('../models/Printer');
 
 const { isAdmin, ownsShops } = require('../func/auth');
 const { resp, validateObjectIds } = require('../func/misc');
@@ -100,13 +101,31 @@ router.delete('/:shopId', isAdmin, validateObjectIds('shopId'), async (req, res)
 // -------------------------------------------------------------------------- //
 
 router.patch('/:shopId/isOnline', validateObjectIds('shopId'), ownsShops, async (req, res) => {
+  const { printers } = req.body || {};
+
+  if (printers !== undefined) {
+    if (!Array.isArray(printers) || (printers.length && !validateObjectIds.check(...printers))) {
+      return resp(res, 400, 'missing or invalid field(s) (printers)');
+    }
+  }
+
+  const now = new Date();
+
   const shop = await Shop.findByIdAndUpdate(
     req.params.shopId,
-    { lastSeen: new Date() },
+    { lastSeen: now },
     { returnDocument: 'after' }
   );
 
   if (!shop) return resp(res, 404, 'Shop does not exist');
+
+  if (printers?.length) {
+    await Printer.updateMany(
+      { _id: { $in: printers }, shop: req.params.shopId },
+      { lastSeen: now },
+    );
+  }
+
   return resp(res, 200, 'Updated isOnline', { shop });
 });
 

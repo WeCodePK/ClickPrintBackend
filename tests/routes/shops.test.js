@@ -4,12 +4,14 @@ const { connectTestDb, clearTestDb, closeTestDb } = require('../helpers/db');
 
 let app;
 let Shop;
+let Printer;
 let factories;
 
 beforeAll(async () => {
   await connectTestDb();
   app = require('../../src/app');
   Shop = require('../../src/models/Shop');
+  Printer = require('../../src/models/Printer');
   factories = require('../helpers/factories');
 });
 
@@ -265,5 +267,43 @@ describe('PATCH /api/shops/:shopId/isOnline', () => {
     expect(res.status).toBe(200);
     const updated = await Shop.findById(shop._id);
     expect(updated.lastSeen.getTime()).toBeGreaterThan(0);
+  });
+
+  test('updates lastSeen for the listed printers belonging to the shop', async () => {
+    const shop = await factories.createShop();
+    const otherShop = await factories.createShop();
+    const user = await factories.createUser();
+    await factories.createOwner({ user: user._id, shop: shop._id });
+    const token = factories.bearer({ uid: String(user._id) });
+
+    const printer1 = await factories.createPrinter({ shop: shop._id });
+    const printer2 = await factories.createPrinter({ shop: shop._id });
+    const foreignPrinter = await factories.createPrinter({ shop: otherShop._id });
+
+    const res = await request(app)
+      .patch(`/api/shops/${shop._id}/isOnline`)
+      .set('Authorization', token)
+      .send({ printers: [String(printer1._id), String(printer2._id), String(foreignPrinter._id)] });
+
+    expect(res.status).toBe(200);
+
+    expect((await Printer.findById(printer1._id)).lastSeen.getTime()).toBeGreaterThan(0);
+    expect((await Printer.findById(printer2._id)).lastSeen.getTime()).toBeGreaterThan(0);
+    // Not owned by this shop, so it should be left untouched.
+    expect((await Printer.findById(foreignPrinter._id)).lastSeen.getTime()).toBe(0);
+  });
+
+  test('400s when printers is not an array of valid ObjectIds', async () => {
+    const shop = await factories.createShop();
+    const user = await factories.createUser();
+    await factories.createOwner({ user: user._id, shop: shop._id });
+    const token = factories.bearer({ uid: String(user._id) });
+
+    const res = await request(app)
+      .patch(`/api/shops/${shop._id}/isOnline`)
+      .set('Authorization', token)
+      .send({ printers: ['not-an-id'] });
+
+    expect(res.status).toBe(400);
   });
 });
