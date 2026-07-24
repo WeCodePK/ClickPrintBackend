@@ -79,7 +79,12 @@ router.post('/otp', async (req, res) => {
   );
 
   await sendViaSms(number, `[ClickPrint] Your login OTP is: ${code}`);
-  return resp(res, 200, 'otp sent');
+  return resp(res, 200, 'otp sent', { 
+    config: {
+      codeLength: 5,
+      resendInMs: 30000,
+    }
+  });
 });
 
 // -------------------------------------------------------------------------- //
