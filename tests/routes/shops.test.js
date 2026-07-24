@@ -137,7 +137,9 @@ describe('PUT /api/shops/:shopId', () => {
 
   test('lets the shop update its own contact fields but not its name', async () => {
     const shop = await factories.createShop();
-    const token = factories.bearer({ uid: String((await factories.createUser())._id), sid: String(shop._id) });
+    const user = await factories.createUser();
+    await factories.createOwner({ user: user._id, shop: shop._id });
+    const token = factories.bearer({ uid: String(user._id) });
 
     const res = await request(app)
       .put(`/api/shops/${shop._id}`)
@@ -241,22 +243,24 @@ describe('DELETE /api/shops/:shopId', () => {
   });
 });
 
-describe('PATCH /api/shops/:shopId/status', () => {
+describe('PATCH /api/shops/:shopId/isOnline', () => {
   test('403s without a matching shop-scoped token', async () => {
     const shop = await factories.createShop();
     const user = await factories.createUser();
 
     const res = await request(app)
-      .patch(`/api/shops/${shop._id}/status`)
+      .patch(`/api/shops/${shop._id}/isOnline`)
       .set('Authorization', factories.bearer({ uid: String(user._id) }));
     expect(res.status).toBe(403);
   });
 
   test('updates lastSeen for the shop itself', async () => {
     const shop = await factories.createShop();
-    const token = factories.bearer({ uid: String((await factories.createUser())._id), sid: String(shop._id) });
+    const user = await factories.createUser();
+    await factories.createOwner({ user: user._id, shop: shop._id });
+    const token = factories.bearer({ uid: String(user._id) });
 
-    const res = await request(app).patch(`/api/shops/${shop._id}/status`).set('Authorization', token);
+    const res = await request(app).patch(`/api/shops/${shop._id}/isOnline`).set('Authorization', token);
 
     expect(res.status).toBe(200);
     const updated = await Shop.findById(shop._id);
