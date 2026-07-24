@@ -152,7 +152,7 @@ router.post('/mint', keyAuth, async (req, res) => {
     process.env.JWT_SECRET
   );
 
-  return resp(res, 200, 'minted token', { token });
+  return resp(res, 200, 'minted token', { token, user });
 });
 
 // -------------------------------------------------------------------------- //
