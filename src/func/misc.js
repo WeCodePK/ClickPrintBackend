@@ -50,10 +50,12 @@ exports.validateObjectIds.check = (...ids) => {
 };
 
 exports.sendViaSms = async (number, message) => {
-  return await fetch(process.env.SMSGATE_URL, {
+  const url = new URL(process.env.SMSGATE_URL);
+  return await fetch(`${url.origin}${url.pathname}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: "Basic " + Buffer.from(`${url?.username}:${url?.password}`).toString("base64"),
     },
     body: JSON.stringify({
       textMessage: { text: message },
