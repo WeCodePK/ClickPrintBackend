@@ -40,8 +40,11 @@ function userToken(user) {
   return factories.bearer({ uid: String(user._id) });
 }
 
-function shopToken(user, shopId) {
-  return factories.bearer({ uid: String(user._id), sid: String(shopId) });
+// Creates a fresh user who owns the given shop, and returns their token.
+async function shopOwnerToken(shopId) {
+  const device = await factories.createUser();
+  await factories.createOwner({ user: device._id, shop: shopId });
+  return userToken(device);
 }
 
 // -------------------------------------------------------------------------- //
@@ -62,17 +65,6 @@ describe('GET /api/jobs', () => {
     expect(res.body.data.jobs).toHaveLength(1);
   });
 
-  test('scopes the list to the shop for a shop-scoped token', async () => {
-    const shop = await factories.createShop();
-    const device = await factories.createUser();
-    await factories.createJob({ shop: shop._id });
-    await factories.createJob();
-
-    const res = await request(app).get('/api/jobs').set('Authorization', shopToken(device, shop._id));
-    expect(res.status).toBe(200);
-    expect(res.body.data.jobs).toHaveLength(1);
-  });
-
   test('lists every job for an admin', async () => {
     const { token } = await asAdmin();
     await factories.createJob();
@@ -80,6 +72,36 @@ describe('GET /api/jobs', () => {
 
     const res = await request(app).get('/api/jobs').set('Authorization', token);
     expect(res.body.data.jobs).toHaveLength(2);
+  });
+});
+
+describe('GET /api/jobs/shops/:shopId', () => {
+  test('403s for someone who does not own the shop', async () => {
+    const shop = await factories.createShop();
+    const user = await factories.createUser();
+
+    const res = await request(app).get(`/api/jobs/shops/${shop._id}`).set('Authorization', userToken(user));
+    expect(res.status).toBe(403);
+  });
+
+  test('scopes the list to the shop for its owner', async () => {
+    const shop = await factories.createShop();
+    await factories.createJob({ shop: shop._id });
+    await factories.createJob();
+
+    const res = await request(app).get(`/api/jobs/shops/${shop._id}`).set('Authorization', await shopOwnerToken(shop._id));
+    expect(res.status).toBe(200);
+    expect(res.body.data.jobs).toHaveLength(1);
+  });
+
+  test('200s for an admin regardless of ownership', async () => {
+    const shop = await factories.createShop();
+    const { token } = await asAdmin();
+    await factories.createJob({ shop: shop._id });
+
+    const res = await request(app).get(`/api/jobs/shops/${shop._id}`).set('Authorization', token);
+    expect(res.status).toBe(200);
+    expect(res.body.data.jobs).toHaveLength(1);
   });
 });
 
@@ -97,6 +119,15 @@ describe('GET /api/jobs/:jobId', () => {
     const job = await factories.createJob({ createdBy: user._id });
 
     const res = await request(app).get(`/api/jobs/${job._id}`).set('Authorization', userToken(user));
+    expect(res.status).toBe(200);
+    expect(res.body.data.job._id).toBe(String(job._id));
+  });
+
+  test('200s for the owner of the job’s shop', async () => {
+    const shop = await factories.createShop();
+    const job = await factories.createJob({ shop: shop._id });
+
+    const res = await request(app).get(`/api/jobs/${job._id}`).set('Authorization', await shopOwnerToken(shop._id));
     expect(res.status).toBe(200);
     expect(res.body.data.job._id).toBe(String(job._id));
   });
@@ -133,12 +164,11 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
   test('403s when a shop targets a job for a different shop', async () => {
     const otherShop = await factories.createShop();
-    const device = await factories.createUser();
     const job = await factories.createJob({ status: 'submitted' });
 
     const res = await request(app)
       .patch(`/api/jobs/${job._id}/status`)
-      .set('Authorization', shopToken(device, otherShop._id))
+      .set('Authorization', await shopOwnerToken(otherShop._id))
       .send({ status: 'queued' });
     expect(res.status).toBe(403);
   });
@@ -157,36 +187,33 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
   test('409s on an illegal transition', async () => {
     const shop = await factories.createShop();
-    const device = await factories.createUser();
     const job = await factories.createJob({ shop: shop._id, status: 'submitted' });
 
     const res = await request(app)
       .patch(`/api/jobs/${job._id}/status`)
-      .set('Authorization', shopToken(device, shop._id))
+      .set('Authorization', await shopOwnerToken(shop._id))
       .send({ status: 'printing' }); // submitted can only go to queued/cancelled
     expect(res.status).toBe(409);
   });
 
   test('409s when the job is already in a terminal state', async () => {
     const shop = await factories.createShop();
-    const device = await factories.createUser();
     const job = await factories.createJob({ shop: shop._id, status: 'completed' });
 
     const res = await request(app)
       .patch(`/api/jobs/${job._id}/status`)
-      .set('Authorization', shopToken(device, shop._id))
+      .set('Authorization', await shopOwnerToken(shop._id))
       .send({ status: 'printing' });
     expect(res.status).toBe(409);
   });
 
   test('advances submitted -> queued as the shop and notifies the user', async () => {
     const shop = await factories.createShop();
-    const device = await factories.createUser();
     const job = await factories.createJob({ shop: shop._id, status: 'submitted' });
 
     const res = await request(app)
       .patch(`/api/jobs/${job._id}/status`)
-      .set('Authorization', shopToken(device, shop._id))
+      .set('Authorization', await shopOwnerToken(shop._id))
       .send({ status: 'queued' });
 
     expect(res.status).toBe(200);
@@ -197,7 +224,6 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
   test('cancelling refunds the user and archives the job to history', async () => {
     const shop = await factories.createShop();
-    const device = await factories.createUser();
     const creator = await factories.createUser({ balance: 40 });
     const job = await factories.createJob({
       shop: shop._id,
@@ -208,7 +234,7 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
     const res = await request(app)
       .patch(`/api/jobs/${job._id}/status`)
-      .set('Authorization', shopToken(device, shop._id))
+      .set('Authorization', await shopOwnerToken(shop._id))
       .send({ status: 'cancelled' });
 
     expect(res.status).toBe(200);
@@ -221,7 +247,6 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
   test('completing a printing job archives it without a refund', async () => {
     const shop = await factories.createShop();
-    const device = await factories.createUser();
     const creator = await factories.createUser({ balance: 40 });
     const job = await factories.createJob({
       shop: shop._id,
@@ -232,7 +257,7 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
     const res = await request(app)
       .patch(`/api/jobs/${job._id}/status`)
-      .set('Authorization', shopToken(device, shop._id))
+      .set('Authorization', await shopOwnerToken(shop._id))
       .send({ status: 'completed' });
 
     expect(res.status).toBe(200);
@@ -241,5 +266,22 @@ describe('PATCH /api/jobs/:jobId/status', () => {
 
     const unchanged = await User.findById(creator._id);
     expect(unchanged.balance).toBe(40);
+  });
+
+  test('a shop owner who also created the job acts as the shop', async () => {
+    const shop = await factories.createShop();
+    const device = await factories.createUser();
+    await factories.createOwner({ user: device._id, shop: shop._id });
+    const job = await factories.createJob({ shop: shop._id, createdBy: device._id, status: 'submitted' });
+
+    // submitted -> queued is shop-only; if the dual identity were treated as
+    // 'user' this would 403.
+    const res = await request(app)
+      .patch(`/api/jobs/${job._id}/status`)
+      .set('Authorization', userToken(device))
+      .send({ status: 'queued' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.job.statusHistory.at(-1).by).toBe('shop');
   });
 });
