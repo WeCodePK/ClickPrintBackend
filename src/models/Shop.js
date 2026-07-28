@@ -109,7 +109,18 @@ const shopSchema = new mongoose.Schema({
     },
   },
 
-}, { timestamps: false, versionKey: false, });
+}, { 
+  id: false,
+  timestamps: false,
+  versionKey: false,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+});
+
+shopSchema.virtual('isOnline').get(function () {
+  if (!this.lastSeen) return false;
+  return Date.now() - this.lastSeen.getTime() < 10000;
+});
 
 const Shop = mongoose.model('Shop', shopSchema);
 

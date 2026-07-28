@@ -54,7 +54,7 @@ printerSchema.index({ shop: 1, name: 1 }, { unique: true });
 
 printerSchema.virtual('isOnline').get(function () {
   if (!this.lastSeen) return false;
-  return Date.now() - this.lastSeen.getTime() < 5000;
+  return Date.now() - this.lastSeen.getTime() < 10000;
 });
 
 const Printer = mongoose.model('Printer', printerSchema);
