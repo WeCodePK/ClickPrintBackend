@@ -115,9 +115,9 @@ router.get('/', isAdmin, async (req, res) => {
 
 // GET /api/services/:shopId — admin or shop owner: all services of one shop.
 router.get('/:shopId', validateObjectIds('shopId'), async (req, res) => {
-  if (!await canManageShop(req.token.uid, req.params.shopId)) {
-    return resp(res, 403, 'forbidden');
-  }
+  // if (!await canManageShop(req.token.uid, req.params.shopId)) {
+  //   return resp(res, 403, 'forbidden');
+  // } everyone should be able to view a shops services
 
   const services = await Service.find({ shop: req.params.shopId })
     .populate(Service.servicePopulate);
@@ -127,9 +127,9 @@ router.get('/:shopId', validateObjectIds('shopId'), async (req, res) => {
 
 // GET /api/services/:shopId/:serviceId — admin or shop owner: one service.
 router.get('/:shopId/:serviceId', validateObjectIds('shopId', 'serviceId'), async (req, res) => {
-  if (!await canManageShop(req.token.uid, req.params.shopId)) {
-    return resp(res, 403, 'forbidden');
-  }
+  // if (!await canManageShop(req.token.uid, req.params.shopId)) {
+  //   return resp(res, 403, 'forbidden');
+  // } everyone should be able to view a shops services
 
   const service = await Service.findOne({ _id: req.params.serviceId, shop: req.params.shopId })
     .populate(Service.servicePopulate);
