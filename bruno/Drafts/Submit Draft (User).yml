@@ -8,9 +8,18 @@ http:
   url: "{{host}}/api/drafts/:draftId/submit"
   params:
     - name: draftId
-      value: 6a5df922314cfee5ef348f5d
+      value: "{{draftId}}"
       type: path
   auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+        if (body && body?.success && body?.data?.job?._id) {
+          bru.setVar("jobId", body.data.job._id);
+        }
 
 settings:
   encodeUrl: true

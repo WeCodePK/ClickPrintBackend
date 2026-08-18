@@ -10,16 +10,16 @@ http:
     type: json
     data: |-
       {
-        "shop": "6a5d945512722b1be6c0ca1f",
+        "shop": "6a77e7500842b630acec5b52",
         "files": [
           {
-            "file": "58f91b59-2014-4ddd-968b-88ba9668cd1e",
+            "file": "1b8a329b-0ea5-4c66-9abd-ef46e75922fd",
             "settings": {
               "color": false,
               "pageType": "A4",
               "pagesPerSheet": 1,
               "numberOfCopies": 1,
-              "sidedness": "long",
+              "sidedness": "none",
               "pageSelection": "",
               "orientation": "portrait"
             }
@@ -27,6 +27,15 @@ http:
         ]
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+        if (body && body?.success && body?.data?.draft?._id) {
+          bru.setVar("draftId", body.data.draft._id);
+        }
 
 settings:
   encodeUrl: true
