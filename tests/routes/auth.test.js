@@ -67,7 +67,7 @@ describe('POST /api/auth/otp', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.config).toMatchObject({ codeLength: 5 });
-    expect(sendViaSms).toHaveBeenCalledWith(number, expect.stringContaining('OTP'));
+    expect(sendViaSms).toHaveBeenCalledWith(number, expect.stringContaining('code'));
 
     const stored = await Otp.findOne({ number });
     expect(stored).not.toBeNull();
