@@ -78,7 +78,7 @@ router.post('/otp', async (req, res) => {
     { upsert: true, returnDocument: 'after' }
   );
 
-  await sendViaSms(number, `[ClickPrint] Your OTP is: ${code}`);
+  await sendViaSms(number, `Your ClickPrint code is: ${code}\n\n@${process.env.WEBOTP_SMS_ORIGIN} #${code}`);
   return resp(res, 200, 'otp sent', { 
     config: {
       codeLength: OTP_LENGTH,
