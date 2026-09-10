@@ -25,6 +25,7 @@ app.use(morgan('combined', {
 
 app.use(cors({
   origin: '*',
+  maxAge: 7200,
   allowedHeaders: ['Content-Type', 'Authorization'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }));
