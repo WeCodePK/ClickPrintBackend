@@ -10,7 +10,6 @@ const required = [
   'EXPO_ACCESS_TOKEN',
   'MONGODB_URI',
   'SMSGATE_URL',
-  'WEBOTP_SMS_ORIGIN'
 ];
 
 for (const v of required) {
