@@ -10,6 +10,7 @@ const required = [
   'EXPO_ACCESS_TOKEN',
   'MONGODB_URI',
   'SMSGATE_URL',
+  'NOTIFYBOT_URL'
 ];
 
 for (const v of required) {
