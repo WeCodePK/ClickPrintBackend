@@ -63,3 +63,15 @@ exports.sendViaSms = async (number, message) => {
     })
   });
 };
+
+exports.sendViaNotifyBot = async ({ chatId, message, imageUrl } = {}) => {
+  return await fetch(process.env.NOTIFYBOT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...(chatId && { chatId }),
+      ...(message && { message }),
+      ...(imageUrl && { imageUrl }),
+    })
+  });
+};
