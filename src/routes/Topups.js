@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
   });
 
   sendViaNotifyBot({
-    imageUrl: `${PUBLIC_URL}/api/files/${paymentProofFile}`
+    imageUrl: `${process.env.PUBLIC_URL}/api/files/${paymentProofFile}`
   });
 
   await topup.populate(Topup.filePopulate);
