@@ -114,7 +114,7 @@ const calculateJobCost = (files, services) => {
   });
 
   const extra = [
-    { item: 'Test Fee', subtotal: 10 }
+    // { item: 'Test Fee', subtotal: 10 }
   ];
 
   const total =
