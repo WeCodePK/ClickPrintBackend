@@ -1,0 +1,25 @@
+info:
+  name: Submit Contact Form (Unauthenticated)
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/contact/form"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Abdul Ahad",
+        "email": "ahad@example.com",
+        "number": "03001234567",
+        "message": "Hello, I have a question about printing."
+      }
+  auth:
+    type: none
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

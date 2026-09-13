@@ -54,6 +54,7 @@ app.get('/health', async (req, res) => {
 
 app.use('/api/admins',    jwtAuth,  require('./routes/Admins.js'));
 app.use('/api/auth',                require('./routes/Auth.js'));
+app.use('/api/contact',             require('./routes/Contact.js'));
 app.use('/api/drafts',    jwtAuth,  require('./routes/Drafts.js'));
 app.use('/api/events',    jwtAuth,  require('./routes/Events.js'));
 app.use('/api/files',               require('./routes/Files.js'));
