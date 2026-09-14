@@ -52,8 +52,13 @@ async function serveFile(req, res, prefix = '') {
   // fall back to the file id with a .pdf extension.
   let filename = `${fileId}.pdf`;
   if (!prefix) {
-    const record = await File.findById(fileId).select('name').lean();
+    const record = await File.findById(fileId).select('name type').lean();
     if (record?.name) filename = record.name;
+    if (record?.type === 'pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+    }
+  } else {
+    res.setHeader('Content-Type', 'application/pdf');
   }
 
   res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
