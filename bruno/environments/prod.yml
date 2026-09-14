@@ -2,7 +2,7 @@ name: prod
 color: "#B83D7F"
 variables:
   - name: host
-    value: https://clickprintbackend.wckd.pk
+    value: https://api.clickprint.pk
   - secret: true
     name: token
   - secret: true
