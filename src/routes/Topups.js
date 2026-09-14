@@ -6,7 +6,7 @@ const File = require('../models/File');
 const User = require('../models/User');
 
 const { isAdmin } = require('../func/auth');
-const { resp, validateObjectIds } = require('../func/misc');
+const { resp, validateObjectIds, sendViaNotifyBot } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
@@ -30,6 +30,11 @@ router.post('/', async (req, res) => {
     amount,
     paymentProofFile,
     createdBy: req.token.uid,
+  });
+
+  sendViaNotifyBot({
+    message: "New Topup request",
+    imageUrl: `${process.env.PUBLIC_URL}/api/files/${paymentProofFile}`
   });
 
   await topup.populate(Topup.filePopulate);

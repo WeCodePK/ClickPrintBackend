@@ -1,0 +1,25 @@
+info:
+  name: Submit Registration Form (Unauthenticated)
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/contact/register"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Abdul Ahad",
+        "number": "03001234567",
+        "shopName": "Ahad Printers",
+        "shopAddress": "123 Main Street, Islamabad"
+      }
+  auth:
+    type: none
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -14,24 +14,24 @@ const History = require('../models/History');
 // atomic and conditional on sufficient funds, so two concurrent submits can't
 // overdraw the balance.
 async function deductWallet(job, session) {
-  const updated = await User.findOneAndUpdate(
-    { _id: job.createdBy, balance: { $gte: job.cost.total } },
-    { $inc: { balance: -job.cost.total } },
-    { session, returnDocument: 'after' }
-  );
+  // const updated = await User.findOneAndUpdate(
+  //   { _id: job.createdBy, balance: { $gte: job.cost.total } },
+  //   { $inc: { balance: -job.cost.total } },
+  //   { session, returnDocument: 'after' }
+  // );
 
-  if (!updated) {
-    throw new Error(`Insufficient balance to charge job ${job._id}`);
-  }
+  // if (!updated) {
+  //   throw new Error(`Insufficient balance to charge job ${job._id}`);
+  // }
 }
 
 // Return the job's cost to the owner's wallet when it is cancelled or failed.
 async function issueRefund(job, session) {
-  await User.updateOne(
-    { _id: job.createdBy },
-    { $inc: { balance: job.cost.total } },
-    { session }
-  );
+  // await User.updateOne(
+  //   { _id: job.createdBy },
+  //   { $inc: { balance: job.cost.total } },
+  //   { session }
+  // );
 }
 
 // Archive a terminal job into the History collection and remove it from the

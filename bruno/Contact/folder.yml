@@ -1,7 +1,7 @@
 info:
-  name: Flags
+  name: Contact
   type: folder
-  seq: 6
+  seq: 16
 
 request:
   auth: inherit

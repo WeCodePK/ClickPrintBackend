@@ -8,7 +8,7 @@ http:
   url: "{{host}}/api/jobs/:jobId"
   params:
     - name: jobId
-      value: ""
+      value: "{{jobId}}"
       type: path
   auth: inherit
 

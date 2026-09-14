@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const validateShopName = (v) => {
+const validateName = (v) => {
   if (!/^[\p{L}\p{N}\s.,'&()\-]+$/u.test(v)) return false;                    // allowed chars only
   if (!/[\p{L}\p{N}]/u.test(v)) return false;                                 // must contain a letter or digit
   if (!/^[\p{L}\p{N}].*[\p{L}\p{N}]$|^[\p{L}\p{N}]$/u.test(v)) return false;  // start & end alphanumeric
@@ -8,17 +8,89 @@ const validateShopName = (v) => {
   return true;
 };
 
+// Looser than validateName: account titles may end with "." or ")" (e.g. "Ahad & Co.", "Ahad (Pvt.)")
+const validateWalletTitle = (v) => {
+  if (!/^[\p{L}\p{N}\s.,'&()\-]+$/u.test(v)) return false;  // allowed chars only
+  if (!/\p{L}/u.test(v)) return false;                        // must contain a letter
+  if (!/^[\p{L}\p{N}]/u.test(v)) return false;                // start alphanumeric
+  if (!/[\p{L}\p{N}.)]$/u.test(v)) return false;              // end alphanumeric, "." or ")"
+  if (/([.,'&()\-])\1/.test(v)) return false;                 // no repeated punctuation
+  return true;
+};
+
+const collapseSpaces = (v) => typeof v === 'string' ? v.replace(/\s+/g, ' ').trim() : v;
+
+// IBAN mod-97 check: move the first 4 chars to the end, map letters to 10..35, remainder must be 1
+const isValidIbanChecksum = (iban) => {
+  const rearranged = iban.slice(4) + iban.slice(0, 4);
+  let remainder = 0;
+  for (const ch of rearranged) {
+    const digits = /\d/.test(ch) ? ch : String(ch.charCodeAt(0) - 55);
+    for (const d of digits) remainder = (remainder * 10 + Number(d)) % 97;
+  }
+  return remainder === 1;
+};
+
+const validateWalletNumber = (v) => {
+  if (/^PK/.test(v)) return /^PK\d{2}[A-Z]{4}\d{16}$/.test(v) && isValidIbanChecksum(v); // PK IBAN
+  return /^\d{8,20}$/.test(v);                                                            // account or mobile wallet number
+};
+
+const walletSchema = new mongoose.Schema({
+
+  bank: {
+    type: String,
+    required: [true, 'Field `wallet.bank` is required'],
+    trim: true,
+    set: collapseSpaces,
+    minlength: [2, 'Field `wallet.bank` must be at least 2 characters'],
+    maxlength: [50, 'Field `wallet.bank` can not exceed 50 characters'],
+    validate: {
+      validator: validateName,
+      message: 'Field `wallet.bank` contains invalid characters or sequences',
+    },
+  },
+
+  title: {
+    type: String,
+    required: [true, 'Field `wallet.title` is required'],
+    trim: true,
+    set: collapseSpaces,
+    minlength: [2, 'Field `wallet.title` must be at least 2 characters'],
+    maxlength: [100, 'Field `wallet.title` can not exceed 100 characters'],
+    validate: {
+      validator: validateWalletTitle,
+      message: 'Field `wallet.title` contains invalid characters or sequences',
+    },
+  },
+
+  number: {
+    type: String,
+    required: [true, 'Field `wallet.number` is required'],
+    trim: true,
+    // Normalise: strip spaces/dashes, uppercase IBAN letters, turn +923XXXXXXXXX into 03XXXXXXXXX
+    set: (v) => typeof v === 'string'
+      ? v.replace(/[\s\-]/g, '').toUpperCase().replace(/^\+92(?=3\d{9}$)/, '0')
+      : v,
+    validate: {
+      validator: validateWalletNumber,
+      message: 'Field `wallet.number` must be a valid PK IBAN (e.g. PK36SCBL0000001123456702), account number (8-20 digits) or mobile wallet number (e.g. 03001234567)',
+    },
+  },
+
+}, { _id: false, id: false, versionKey: false });
+
 const shopSchema = new mongoose.Schema({
 
   name: {
     type: String,
     required: [true, 'Field `name` is required'],
     trim: true,
-    set: (v) => typeof v === 'string' ? v.replace(/\s+/g, ' ').trim() : v,
+    set: collapseSpaces,
     minlength: [2, 'Field `name` must be at least 2 characters'],
     maxlength: [50, 'Field `name` can not exceed 50 characters'],
     validate: {
-      validator: validateShopName,
+      validator: validateName,
       message: 'Field `name` contains invalid characters or sequences',
     },
   },
@@ -84,6 +156,10 @@ const shopSchema = new mongoose.Schema({
       },
       message: 'Field `timings` must be 7 entries, each "Closed" or "HH:MM-HH:MM"',
     },
+  },
+
+  wallet: {
+    type: walletSchema,
   },
 
   imageFile: {
