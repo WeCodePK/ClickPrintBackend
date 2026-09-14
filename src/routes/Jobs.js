@@ -14,22 +14,29 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 
 // -------------------------------------------------------------------------- //
 
-// A user's own jobs (or, for an admin, every job).
-router.get('/', async (req, res) => {
-  const query = (await isAdmin(req.token.uid)) ? {} : { createdBy: req.token.uid };
+// GET /api/jobs lists every job (admins only); GET /api/jobs/user/:userId
+// lists one user's jobs (that user, or an admin on their behalf).
+router.get(['/', '/user/:userId'], validateObjectIds('userId', { allowEmpty: true }), async (req, res) => {
+  const { userId } = req.params;
+  const admin = await isAdmin(req.token.uid);
 
+  if (!admin && (!userId || userId !== req.token.uid)) {
+    return resp(res, 403, 'forbidden');
+  }
+
+  const filter = userId ? { createdBy: userId } : {};
   const jobs = await Job
-    .find(query)
+    .find(filter)
     .populate(Job.jobPopulate)
     .sort({ createdAt: 1 });
 
-  return resp(res, 200, 'fetched all jobs', {jobs});
+  return resp(res, 200, 'fetched jobs', {jobs});
 });
 
 // -------------------------------------------------------------------------- //
 
 // Admins or the shop's owner: every job for a given shop.
-router.get('/shops/:shopId', validateObjectIds('shopId'), async (req, res) => {
+router.get('/shop/:shopId', validateObjectIds('shopId'), async (req, res) => {
   const isAdm = await isAdmin(req.token.uid);
   const isOwner = await ownsShops(req.token.uid, req.params.shopId);
 

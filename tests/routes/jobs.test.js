@@ -55,14 +55,11 @@ describe('GET /api/jobs', () => {
     expect(res.status).toBe(401);
   });
 
-  test('scopes the list to the caller’s own jobs', async () => {
+  test('403s for a non-admin', async () => {
     const user = await factories.createUser();
-    await factories.createJob({ createdBy: user._id });
-    await factories.createJob();
 
     const res = await request(app).get('/api/jobs').set('Authorization', userToken(user));
-    expect(res.status).toBe(200);
-    expect(res.body.data.jobs).toHaveLength(1);
+    expect(res.status).toBe(403);
   });
 
   test('lists every job for an admin', async () => {
@@ -71,16 +68,48 @@ describe('GET /api/jobs', () => {
     await factories.createJob();
 
     const res = await request(app).get('/api/jobs').set('Authorization', token);
+    expect(res.status).toBe(200);
     expect(res.body.data.jobs).toHaveLength(2);
   });
 });
 
-describe('GET /api/jobs/shops/:shopId', () => {
+describe('GET /api/jobs/user/:userId', () => {
+  test('lists the caller’s own jobs', async () => {
+    const user = await factories.createUser();
+    await factories.createJob({ createdBy: user._id });
+    await factories.createJob();
+
+    const res = await request(app).get(`/api/jobs/user/${user._id}`).set('Authorization', userToken(user));
+    expect(res.status).toBe(200);
+    expect(res.body.data.jobs).toHaveLength(1);
+  });
+
+  test('403s when a non-admin requests another user’s jobs', async () => {
+    const user = await factories.createUser();
+    const otherUser = await factories.createUser();
+
+    const res = await request(app).get(`/api/jobs/user/${otherUser._id}`).set('Authorization', userToken(user));
+    expect(res.status).toBe(403);
+  });
+
+  test('lets an admin list another user’s jobs', async () => {
+    const { token } = await asAdmin();
+    const user = await factories.createUser();
+    await factories.createJob({ createdBy: user._id });
+    await factories.createJob();
+
+    const res = await request(app).get(`/api/jobs/user/${user._id}`).set('Authorization', token);
+    expect(res.status).toBe(200);
+    expect(res.body.data.jobs).toHaveLength(1);
+  });
+});
+
+describe('GET /api/jobs/shop/:shopId', () => {
   test('403s for someone who does not own the shop', async () => {
     const shop = await factories.createShop();
     const user = await factories.createUser();
 
-    const res = await request(app).get(`/api/jobs/shops/${shop._id}`).set('Authorization', userToken(user));
+    const res = await request(app).get(`/api/jobs/shop/${shop._id}`).set('Authorization', userToken(user));
     expect(res.status).toBe(403);
   });
 
@@ -89,7 +118,7 @@ describe('GET /api/jobs/shops/:shopId', () => {
     await factories.createJob({ shop: shop._id });
     await factories.createJob();
 
-    const res = await request(app).get(`/api/jobs/shops/${shop._id}`).set('Authorization', await shopOwnerToken(shop._id));
+    const res = await request(app).get(`/api/jobs/shop/${shop._id}`).set('Authorization', await shopOwnerToken(shop._id));
     expect(res.status).toBe(200);
     expect(res.body.data.jobs).toHaveLength(1);
   });
@@ -99,7 +128,7 @@ describe('GET /api/jobs/shops/:shopId', () => {
     const { token } = await asAdmin();
     await factories.createJob({ shop: shop._id });
 
-    const res = await request(app).get(`/api/jobs/shops/${shop._id}`).set('Authorization', token);
+    const res = await request(app).get(`/api/jobs/shop/${shop._id}`).set('Authorization', token);
     expect(res.status).toBe(200);
     expect(res.body.data.jobs).toHaveLength(1);
   });
