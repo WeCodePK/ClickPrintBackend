@@ -53,21 +53,30 @@ router.post('/', async (req, res) => {
 
 // -------------------------------------------------------------------------- //
 
-router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), async (req, res) => {
+// GET /api/drafts lists every draft (admins only); GET /api/drafts/user/:userId
+// lists one user's drafts (that user, or an admin on their behalf).
+router.get(['/', '/user/:userId'], validateObjectIds('userId', { allowEmpty: true }), async (req, res) => {
+  const { userId } = req.params;
   const admin = await isAdmin(req.token.uid);
 
-  if (req.params.draftId) {
-    const draft = await Draft.findById(req.params.draftId).populate(Draft.draftPopulate);
-
-    if (!draft) return resp(res, 404, 'not found');
-    if (!admin && !draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
-
-    return resp(res, 200, 'fetched draft', {draft});
+  if (!admin && (!userId || userId !== req.token.uid)) {
+    return resp(res, 403, 'forbidden');
   }
 
-  const filter = admin ? {} : { createdBy: req.token.uid };
+  const filter = userId ? { createdBy: userId } : {};
   const drafts = await Draft.find(filter).populate(Draft.draftPopulate);
-  return resp(res, 200, 'fetched all drafts', {drafts});
+  return resp(res, 200, 'fetched drafts', {drafts});
+});
+
+// -------------------------------------------------------------------------- //
+
+router.get('/:draftId', validateObjectIds('draftId'), async (req, res) => {
+  const draft = await Draft.findById(req.params.draftId).populate(Draft.draftPopulate);
+
+  if (!draft) return resp(res, 404, 'not found');
+  if (!await isAdmin(req.token.uid) && !draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+
+  return resp(res, 200, 'fetched draft', {draft});
 });
 
 // -------------------------------------------------------------------------- //

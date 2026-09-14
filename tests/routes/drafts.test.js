@@ -125,14 +125,10 @@ describe('GET /api/drafts/:draftId', () => {
 });
 
 describe('GET /api/drafts', () => {
-  test('only lists the caller’s own drafts when not an admin', async () => {
-    const { user, token } = await authedUser();
-    await factories.createDraft({ createdBy: user._id });
-    await factories.createDraft();
-
+  test('403s for a non-admin', async () => {
+    const { token } = await authedUser();
     const res = await request(app).get('/api/drafts').set('Authorization', token);
-    expect(res.status).toBe(200);
-    expect(res.body.data.drafts).toHaveLength(1);
+    expect(res.status).toBe(403);
   });
 
   test('lists every draft for an admin', async () => {
@@ -141,7 +137,39 @@ describe('GET /api/drafts', () => {
     await factories.createDraft();
 
     const res = await request(app).get('/api/drafts').set('Authorization', token);
+    expect(res.status).toBe(200);
     expect(res.body.data.drafts).toHaveLength(2);
+  });
+});
+
+describe('GET /api/drafts/user/:userId', () => {
+  test('lists the caller’s own drafts', async () => {
+    const { user, token } = await authedUser();
+    await factories.createDraft({ createdBy: user._id });
+    await factories.createDraft();
+
+    const res = await request(app).get(`/api/drafts/user/${user._id}`).set('Authorization', token);
+    expect(res.status).toBe(200);
+    expect(res.body.data.drafts).toHaveLength(1);
+  });
+
+  test('403s when a non-admin requests another user’s drafts', async () => {
+    const { token } = await authedUser();
+    const { user: otherUser } = await authedUser();
+
+    const res = await request(app).get(`/api/drafts/user/${otherUser._id}`).set('Authorization', token);
+    expect(res.status).toBe(403);
+  });
+
+  test('lets an admin list another user’s drafts', async () => {
+    const { token } = await asAdmin();
+    const { user } = await authedUser();
+    await factories.createDraft({ createdBy: user._id });
+    await factories.createDraft();
+
+    const res = await request(app).get(`/api/drafts/user/${user._id}`).set('Authorization', token);
+    expect(res.status).toBe(200);
+    expect(res.body.data.drafts).toHaveLength(1);
   });
 });
 
