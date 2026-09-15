@@ -41,6 +41,13 @@ const contactTypes = {
     label: 'Shop registration request',
     fields: {
       name: { required: true, maxlength: 50, set: collapseSpaces },
+      email: {
+        required: true,
+        maxlength: 100,
+        set: (v) => v.trim().toLowerCase(),
+        validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        message: 'must be a valid email address',
+      },
       number: {
         required: true,
         set: normalizePhoneNumber,
