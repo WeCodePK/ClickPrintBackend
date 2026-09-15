@@ -11,7 +11,7 @@ const { resp, validateObjectIds } = require('../func/misc');
 // -------------------------------------------------------------------------- //
 
 router.post('/', isAdmin, async (req, res) => {
-  const { name, address, coordinates, imageFile, contactNumber, googleMapsLink, timings } = req.body || {};
+  const { name, address, coordinates, imageFile, contactNumber, googleMapsLink, timings, wallet, codLimit } = req.body || {};
 
   if (!name || !address || !coordinates || !imageFile || !contactNumber || !timings) {
     return resp(res, 400, 'missing or invalid field(s) (name, address, coordinates, imageFile, contactNumber, timings)');
@@ -21,7 +21,7 @@ router.post('/', isAdmin, async (req, res) => {
     return resp(res, 400, 'imageFile does not exist');
   }
 
-  const shop = await Shop.create({ name, address, coordinates, imageFile, contactNumber, googleMapsLink, timings });
+  const shop = await Shop.create({ name, address, coordinates, imageFile, contactNumber, googleMapsLink, timings, wallet, codLimit });
 
   return resp(res, 201, 'created shop', { shop });
 });
@@ -50,8 +50,8 @@ router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
   if (!isAdm && !isOwner) return resp(res, 403, 'forbidden');
 
   const allowed = isAdm
-    ? ['name', 'address', 'coordinates', 'imageFile', 'contactNumber', 'googleMapsLink', 'timings']
-    : ['contactNumber', 'googleMapsLink', 'timings'];
+    ? ['name', 'address', 'coordinates', 'imageFile', 'contactNumber', 'googleMapsLink', 'timings', 'wallet', 'codLimit']
+    : ['contactNumber', 'googleMapsLink', 'timings', 'wallet', 'codLimit'];
 
   const body = req.body || {};
   const updates = {};

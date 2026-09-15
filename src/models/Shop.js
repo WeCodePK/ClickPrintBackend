@@ -162,6 +162,15 @@ const shopSchema = new mongoose.Schema({
     type: walletSchema,
   },
 
+  // Highest job total that can still be paid in cash after the job is completed
+  codLimit: {
+    type: Number,
+    validate: {
+      validator: (v) => Number.isInteger(v) && v >= 0 && v <= 100000,
+      message: 'Field `codLimit` must be a whole number between 0 and 100000',
+    },
+  },
+
   imageFile: {
     ref: 'File',
     trim: true,

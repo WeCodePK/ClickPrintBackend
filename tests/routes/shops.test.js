@@ -78,6 +78,66 @@ describe('POST /api/shops', () => {
     expect(res.status).toBe(201);
     expect(res.body.data.shop.name).toBe('Corner Print Shop');
   });
+
+  test('creates a shop with a normalised wallet', async () => {
+    const { token } = await asAdmin();
+    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+
+    const res = await request(app)
+      .post('/api/shops')
+      .set('Authorization', token)
+      .send(validShopBody({
+        imageFile: image._id,
+        wallet: { bank: 'JazzCash', title: 'Ahad & Co.', number: '+92 300-1234567' },
+      }));
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.shop.wallet).toEqual({ bank: 'JazzCash', title: 'Ahad & Co.', number: '03001234567' });
+  });
+
+  test('400s when the wallet is incomplete or invalid', async () => {
+    const { token } = await asAdmin();
+    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+
+    for (const wallet of [
+      { bank: 'JazzCash', title: 'Ali Imtiaz' },
+      { bank: 'JazzCash', title: 'Ali Imtiaz', number: '12ab' },
+      { bank: 'SCB', title: 'Ali Imtiaz', number: 'PK37SCBL0000001123456702' },
+      'not-an-object',
+    ]) {
+      const res = await request(app)
+        .post('/api/shops')
+        .set('Authorization', token)
+        .send(validShopBody({ imageFile: image._id, wallet }));
+      expect(res.status).toBe(400);
+    }
+  });
+
+  test('creates a shop with a codLimit', async () => {
+    const { token } = await asAdmin();
+    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+
+    const res = await request(app)
+      .post('/api/shops')
+      .set('Authorization', token)
+      .send(validShopBody({ imageFile: image._id, codLimit: 500 }));
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.shop.codLimit).toBe(500);
+  });
+
+  test('400s when codLimit is invalid', async () => {
+    const { token } = await asAdmin();
+    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+
+    for (const codLimit of [-1, 10.5, 100001, 'lots']) {
+      const res = await request(app)
+        .post('/api/shops')
+        .set('Authorization', token)
+        .send(validShopBody({ imageFile: image._id, codLimit }));
+      expect(res.status).toBe(400);
+    }
+  });
 });
 
 describe('GET /api/shops', () => {
@@ -165,6 +225,64 @@ describe('PUT /api/shops/:shopId', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.shop.name).toBe('Renamed Shop');
+  });
+
+  test('lets the shop owner set its wallet', async () => {
+    const shop = await factories.createShop();
+    const user = await factories.createUser();
+    await factories.createOwner({ user: user._id, shop: shop._id });
+    const token = factories.bearer({ uid: String(user._id) });
+
+    const res = await request(app)
+      .put(`/api/shops/${shop._id}`)
+      .set('Authorization', token)
+      .send({ wallet: { bank: 'Standard Chartered', title: 'Ali Imtiaz', number: 'PK36 SCBL 0000 0011 2345 6702' } });
+
+    expect(res.status).toBe(200);
+    expect((await Shop.findById(shop._id)).wallet.number).toBe('PK36SCBL0000001123456702');
+  });
+
+  test('lets the shop owner set its codLimit', async () => {
+    const shop = await factories.createShop();
+    const user = await factories.createUser();
+    await factories.createOwner({ user: user._id, shop: shop._id });
+    const token = factories.bearer({ uid: String(user._id) });
+
+    const res = await request(app)
+      .put(`/api/shops/${shop._id}`)
+      .set('Authorization', token)
+      .send({ codLimit: 250 });
+
+    expect(res.status).toBe(200);
+    expect((await Shop.findById(shop._id)).codLimit).toBe(250);
+  });
+
+  test('400s when an update sends an invalid codLimit', async () => {
+    const shop = await factories.createShop();
+    const { token } = await asAdmin();
+
+    const res = await request(app)
+      .put(`/api/shops/${shop._id}`)
+      .set('Authorization', token)
+      .send({ codLimit: -5 });
+    expect(res.status).toBe(400);
+  });
+
+  test('400s when an update sends an incomplete or invalid wallet', async () => {
+    const shop = await factories.createShop();
+    const { token } = await asAdmin();
+
+    for (const wallet of [
+      { bank: 'JazzCash' },
+      { bank: 'JazzCash', title: '--', number: '03001234567' },
+      'not-an-object',
+    ]) {
+      const res = await request(app)
+        .put(`/api/shops/${shop._id}`)
+        .set('Authorization', token)
+        .send({ wallet });
+      expect(res.status).toBe(400);
+    }
   });
 
   test('400s when the admin sets a non-existent imageFile', async () => {
