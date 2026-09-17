@@ -28,7 +28,8 @@ http:
               "orientation": "portrait"
             }
           }
-        ]
+        ],
+        "additionalComments": "Binding no longer needed, loose sheets are fine"
       }
   auth: inherit
 

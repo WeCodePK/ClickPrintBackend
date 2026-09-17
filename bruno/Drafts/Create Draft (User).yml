@@ -24,7 +24,8 @@ http:
               "orientation": "portrait"
             }
           }
-        ]
+        ],
+        "additionalComments": "Please staple each copy in the top-left corner"
       }
   auth: inherit
 

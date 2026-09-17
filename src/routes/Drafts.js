@@ -17,7 +17,11 @@ const { resp, validateObjectIds } = require('../func/misc');
 // -------------------------------------------------------------------------- //
 
 router.post('/', async (req, res) => {
-  const { files, shop } = req.body || {};
+  const { files, shop, additionalComments } = req.body || {};
+
+  if (additionalComments !== undefined && typeof additionalComments !== 'string') {
+    return resp(res, 400, 'additionalComments must be a string');
+  }
   
   if (shop && validateObjectIds.check(shop) && !await Shop.exists({ _id: shop })) {
     return resp(res, 400, 'shop does not exist');
@@ -43,7 +47,7 @@ router.post('/', async (req, res) => {
   }
 
   const draft = await Draft.create({
-    files, shop,
+    files, shop, additionalComments,
     createdBy: req.token.uid,
   });
 
@@ -82,7 +86,7 @@ router.get('/:draftId', validateObjectIds('draftId'), async (req, res) => {
 // -------------------------------------------------------------------------- //
 
 router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
-  const { files, shop } = req.body || {};
+  const { files, shop, additionalComments } = req.body || {};
 
   const draft = await Draft.findById(req.params.draftId);
 
@@ -120,6 +124,14 @@ router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
     }
 
     draft.files = files;
+  }
+
+  if (additionalComments !== undefined) {
+    if (typeof additionalComments !== 'string') {
+      return resp(res, 400, 'additionalComments must be a string');
+    }
+
+    draft.additionalComments = additionalComments;
   }
 
   delete draft.cost;

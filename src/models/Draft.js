@@ -185,6 +185,14 @@ const draftSchema = new mongoose.Schema({
     type: costSchema,
   },
 
+  additionalComments: {
+    type: String,
+    default: '',
+    required: false,
+    trim: true,
+    maxlength: [500, 'Field `additionalComments` cannot exceed 500 characters'],
+  },
+
   createdBy: {
     ref: 'User',
     type: mongoose.Schema.Types.ObjectId,
