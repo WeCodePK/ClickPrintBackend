@@ -25,7 +25,8 @@ http:
             }
           }
         ],
-        "additionalComments": "Please staple each copy in the top-left corner"
+        "additionalComments": "Please staple each copy in the top-left corner",
+        "paymentProofFile": "95e498e0-ade0-4b12-9317-00772d61142e"
       }
   auth: inherit
 

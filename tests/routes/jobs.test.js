@@ -297,6 +297,29 @@ describe('PATCH /api/jobs/:jobId/status', () => {
     expect(unchanged.balance).toBe(40);
   });
 
+  test('archiving a job preserves its payment proof in history', async () => {
+    const shop = await factories.createShop();
+    const creator = await factories.createUser({ balance: 40 });
+    const proof = await factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy: creator._id });
+    const job = await factories.createJob({
+      shop: shop._id,
+      createdBy: creator._id,
+      status: 'printing',
+      paymentProofFile: proof._id,
+      cost: { lines: [], extra: [], total: 60 },
+    });
+
+    const res = await request(app)
+      .patch(`/api/jobs/${job._id}/status`)
+      .set('Authorization', await shopOwnerToken(shop._id))
+      .send({ status: 'completed' });
+
+    expect(res.status).toBe(200);
+
+    const archived = await History.findById(job._id);
+    expect(archived.paymentProofFile).toBe(proof._id);
+  });
+
   test('a shop owner who also created the job acts as the shop', async () => {
     const shop = await factories.createShop();
     const device = await factories.createUser();

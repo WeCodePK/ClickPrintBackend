@@ -193,6 +193,13 @@ const draftSchema = new mongoose.Schema({
     maxlength: [500, 'Field `additionalComments` cannot exceed 500 characters'],
   },
 
+  paymentProofFile: {
+    ref: 'File',
+    trim: true,
+    type: String,
+    required: false,
+  },
+
   createdBy: {
     ref: 'User',
     type: mongoose.Schema.Types.ObjectId,
@@ -207,7 +214,8 @@ Draft.draftSchema = draftSchema;
 Draft.draftPopulate = [
   { path: 'shop', select: 'name' },
   { path: 'createdBy', select: 'name number' },
-  { path: 'files.file', select: 'name numberOfPages' }
+  { path: 'paymentProofFile', select: 'name' },
+  { path: 'files.file', select: 'name numberOfPages' },
 ];
 
 module.exports = Draft;

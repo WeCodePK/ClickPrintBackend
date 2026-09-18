@@ -1,3 +1,5 @@
+- Drafts accept an optional `paymentProofFile` (a file id, as on topups) on `POST /api/drafts` and `PUT /api/drafts/:draftId`. Pass `null` on update to detach it. It carries over onto the job on submit and into history on archival.
+
 - `GET /api/events` is now `/api/events/:shopId`
 
 - `POST /api/files` now requires a `convert`: `true/false`

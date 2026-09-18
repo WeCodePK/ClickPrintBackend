@@ -43,6 +43,12 @@ async function shopWithMatchingService(rate = 5) {
   return shop;
 }
 
+// The payment proof is an uploaded receipt image rather than a printable
+// document, so it is stored as a raw file.
+async function proofFile(uploadedBy) {
+  return factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy });
+}
+
 // -------------------------------------------------------------------------- //
 
 describe('POST /api/drafts', () => {
@@ -79,6 +85,39 @@ describe('POST /api/drafts', () => {
       .set('Authorization', token)
       .send({ files: [{ file: rawFile._id }] });
     expect(res.status).toBe(400);
+  });
+
+  test('400s when paymentProofFile does not exist', async () => {
+    const { token } = await authedUser();
+
+    const res = await request(app)
+      .post('/api/drafts')
+      .set('Authorization', token)
+      .send({ paymentProofFile: '00000000-0000-4000-8000-000000000000' });
+    expect(res.status).toBe(400);
+  });
+
+  test('400s when paymentProofFile is not a non-empty string', async () => {
+    const { token } = await authedUser();
+
+    const res = await request(app)
+      .post('/api/drafts')
+      .set('Authorization', token)
+      .send({ paymentProofFile: '' });
+    expect(res.status).toBe(400);
+  });
+
+  test('stores and populates paymentProofFile', async () => {
+    const { user, token } = await authedUser();
+    const proof = await proofFile(user._id);
+
+    const res = await request(app)
+      .post('/api/drafts')
+      .set('Authorization', token)
+      .send({ paymentProofFile: proof._id });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.draft.paymentProofFile).toEqual({ _id: proof._id, name: proof.name });
   });
 
   test('creates a draft owned by the caller', async () => {
@@ -199,6 +238,46 @@ describe('PUT /api/drafts/:draftId', () => {
       .set('Authorization', token)
       .send({ files: 'nope' });
     expect(res.status).toBe(400);
+  });
+
+  test('400s when paymentProofFile does not exist', async () => {
+    const { user, token } = await authedUser();
+    const draft = await factories.createDraft({ createdBy: user._id });
+
+    const res = await request(app)
+      .put(`/api/drafts/${draft._id}`)
+      .set('Authorization', token)
+      .send({ paymentProofFile: '00000000-0000-4000-8000-000000000000' });
+    expect(res.status).toBe(400);
+  });
+
+  test('attaches a payment proof to an existing draft', async () => {
+    const { user, token } = await authedUser();
+    const draft = await factories.createDraft({ createdBy: user._id });
+    const proof = await proofFile(user._id);
+
+    const res = await request(app)
+      .put(`/api/drafts/${draft._id}`)
+      .set('Authorization', token)
+      .send({ paymentProofFile: proof._id });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.draft.paymentProofFile._id).toBe(proof._id);
+  });
+
+  test('detaches the payment proof when it is cleared', async () => {
+    const { user, token } = await authedUser();
+    const proof = await proofFile(user._id);
+    const draft = await factories.createDraft({ createdBy: user._id, paymentProofFile: proof._id });
+
+    const res = await request(app)
+      .put(`/api/drafts/${draft._id}`)
+      .set('Authorization', token)
+      .send({ paymentProofFile: null });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.draft.paymentProofFile).toBeUndefined();
+    expect((await Draft.findById(draft._id)).paymentProofFile).toBeUndefined();
   });
 
   test('updates the shop and files as the owner', async () => {
@@ -325,6 +404,27 @@ describe('PATCH /api/drafts/:draftId/submit', () => {
 
     const res = await request(app).patch(`/api/drafts/${draft._id}/submit`).set('Authorization', token);
     expect(res.status).toBe(402);
+  });
+
+  test('carries the payment proof over onto the job', async () => {
+    const { user, token } = await authedUser({ balance: 1000 });
+    const shop = await shopWithMatchingService(5);
+    const file = await factories.createFile({ uploadedBy: user._id, numberOfPages: 10 });
+    const proof = await proofFile(user._id);
+    const draft = await factories.createDraft({
+      createdBy: user._id,
+      shop: shop._id,
+      paymentProofFile: proof._id,
+      files: [{ file: file._id, settings: factories.fileSettings() }],
+    });
+
+    const res = await request(app).patch(`/api/drafts/${draft._id}/submit`).set('Authorization', token);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.job.paymentProofFile).toEqual({ _id: proof._id, name: proof.name });
+
+    const job = await Job.findById(res.body.data.job._id);
+    expect(job.paymentProofFile).toBe(proof._id);
   });
 
   test('submits the draft: creates a job, deletes the draft, and deducts the balance', async () => {

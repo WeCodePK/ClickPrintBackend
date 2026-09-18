@@ -17,10 +17,19 @@ const { resp, validateObjectIds } = require('../func/misc');
 // -------------------------------------------------------------------------- //
 
 router.post('/', async (req, res) => {
-  const { files, shop, additionalComments } = req.body || {};
+  const { files, shop, additionalComments, paymentProofFile } = req.body || {};
 
   if (additionalComments !== undefined && typeof additionalComments !== 'string') {
     return resp(res, 400, 'additionalComments must be a string');
+  }
+
+  if (paymentProofFile !== undefined) {
+    if (typeof paymentProofFile !== 'string' || !paymentProofFile) {
+      return resp(res, 400, 'missing or invalid fields (paymentProofFile)');
+    }
+    if (!await File.exists({ _id: paymentProofFile })) {
+      return resp(res, 400, 'payment proof file does not exist');
+    }
   }
   
   if (shop && validateObjectIds.check(shop) && !await Shop.exists({ _id: shop })) {
@@ -47,7 +56,7 @@ router.post('/', async (req, res) => {
   }
 
   const draft = await Draft.create({
-    files, shop, additionalComments,
+    files, shop, additionalComments, paymentProofFile,
     createdBy: req.token.uid,
   });
 
@@ -86,7 +95,7 @@ router.get('/:draftId', validateObjectIds('draftId'), async (req, res) => {
 // -------------------------------------------------------------------------- //
 
 router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
-  const { files, shop, additionalComments } = req.body || {};
+  const { files, shop, additionalComments, paymentProofFile } = req.body || {};
 
   const draft = await Draft.findById(req.params.draftId);
 
@@ -132,6 +141,20 @@ router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
     }
 
     draft.additionalComments = additionalComments;
+  }
+
+  // Unlike shop, the payment proof is optional and may be detached again by
+  // passing null or an empty string.
+  if (paymentProofFile !== undefined) {
+    if (paymentProofFile === null || paymentProofFile === '') {
+      draft.paymentProofFile = undefined;
+    }
+    else if (typeof paymentProofFile !== 'string' || !await File.exists({ _id: paymentProofFile })) {
+      return resp(res, 400, 'payment proof file does not exist');
+    }
+    else {
+      draft.paymentProofFile = paymentProofFile;
+    }
   }
 
   delete draft.cost;
