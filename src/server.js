@@ -11,6 +11,7 @@ const required = [
   'MONGODB_URI',
   'SMSGATE_URL',
   'NOTIFYBOT_URL',
+  'PUBLIC_URL'
 ];
 
 for (const v of required) {
