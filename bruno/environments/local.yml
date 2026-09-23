@@ -2,7 +2,7 @@ name: local
 color: "#346AB2"
 variables:
   - name: host
-    value: http://localhost:3000
+    value: http://localhost
   - secret: true
     name: token
   - secret: true
