@@ -78,7 +78,8 @@ async function createFile(overrides = {}) {
 
   return File.create({
     name: `file-${next()}.pdf`,
-    type: 'pdf',
+    mimeType: 'application/pdf',
+    size: 1234,
     numberOfPages: 10,
     uploadedBy,
     ...overrides,
@@ -192,7 +193,7 @@ async function createHistory(overrides = {}) {
 
 async function createTopup(overrides = {}) {
   const createdBy = overrides.createdBy || (await createUser())._id;
-  const paymentProofFile = overrides.paymentProofFile || (await createFile({ type: 'raw', numberOfPages: undefined, uploadedBy: createdBy }))._id;
+  const paymentProofFile = overrides.paymentProofFile || (await createFile({ uploadedBy: createdBy }))._id;
 
   return Topup.create({
     status: 'pending',

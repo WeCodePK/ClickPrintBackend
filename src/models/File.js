@@ -34,26 +34,27 @@ const fileSchema = new mongoose.Schema({
     },
   },
 
-  type: {
+  mimeType: {
     type: String,
-    required: [true, 'Field `type` is required'],
-    enum: {
-      values: ['raw', 'pdf'],
-      message: '`{VALUE}` is not a valid value for field `type`',
+    required: [true, 'Field `mimeType` is required'],
+    trim: true,
+    maxlength: [255, 'Field `mimeType` can not exceed 255 characters'],
+  },
+
+  size: {
+    type: Number,
+    required: [true, 'Field `size` is required'],
+    validate: {
+      validator: (v) => Number.isInteger(v) && v >= 0,
+      message: 'Field `size` must be a non-negative whole number',
     },
   },
 
   numberOfPages: {
     type: Number,
-    required: [
-      function () { return this.type === 'pdf'; },
-      'Field `numberOfPages` is required for `type` = `pdf` files',
-    ],
+    required: [true, 'Field `numberOfPages` is required'],
     validate: {
-      validator(v) {
-        if (v === undefined || v === null) return true;
-        return Number.isInteger(v) && v >= 1 && v <= 10000;
-      },
+      validator: (v) => Number.isInteger(v) && v >= 1 && v <= 10000,
       message: 'Field `numberOfPages` must be a whole number between 1 and 10000',
     },
   },
@@ -81,5 +82,7 @@ const File = mongoose.model('File', fileSchema);
 File.filePopulate = [
   { path: 'uploadedBy', select: 'name number' },
 ];
+
+File.validateFileName = validateFileName;
 
 module.exports = File;

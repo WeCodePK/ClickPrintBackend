@@ -3,20 +3,28 @@ info:
   type: http
   seq: 1
 
+# tus creation-with-upload in a single request. Upload-Length must equal the
+# file's size in bytes, and Upload-Metadata is comma separated "key base64"
+# pairs (filename is required, filetype optional). Real clients should use a
+# tus client (e.g. tus-js-client) to get chunking and resume.
 http:
   method: POST
   url: "{{host}}/api/files"
+  headers:
+    - name: Tus-Resumable
+      value: 1.0.0
+    - name: Upload-Length
+      value: "0"
+    - name: Upload-Metadata
+      value: filename ZG9jdW1lbnQucGRm,filetype YXBwbGljYXRpb24vcGRm
+    - name: Content-Type
+      value: application/offset+octet-stream
   body:
-    type: multipart-form
+    type: file
     data:
-      - name: file
-        type: file
-        value:
-          - /home/ahad/Pictures/Screenshots/Screenshot From 2026-07-20 15-26-14.png
-        contentType: image/png
-      - name: convert
-        type: text
-        value: "true"
+      - filePath: /home/ahad/Documents/document.pdf
+        contentType: application/offset+octet-stream
+        selected: true
   auth: inherit
 
 settings:

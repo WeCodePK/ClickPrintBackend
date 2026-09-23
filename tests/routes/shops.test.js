@@ -68,7 +68,7 @@ describe('POST /api/shops', () => {
 
   test('creates a shop as an admin', async () => {
     const { token } = await asAdmin();
-    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+    const image = await factories.createFile();
 
     const res = await request(app)
       .post('/api/shops')
@@ -81,7 +81,7 @@ describe('POST /api/shops', () => {
 
   test('creates a shop with a normalised wallet', async () => {
     const { token } = await asAdmin();
-    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+    const image = await factories.createFile();
 
     const res = await request(app)
       .post('/api/shops')
@@ -97,7 +97,7 @@ describe('POST /api/shops', () => {
 
   test('400s when the wallet is incomplete or invalid', async () => {
     const { token } = await asAdmin();
-    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+    const image = await factories.createFile();
 
     for (const wallet of [
       { bank: 'JazzCash', title: 'Ali Imtiaz' },
@@ -115,7 +115,7 @@ describe('POST /api/shops', () => {
 
   test('creates a shop with a codLimit', async () => {
     const { token } = await asAdmin();
-    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+    const image = await factories.createFile();
 
     const res = await request(app)
       .post('/api/shops')
@@ -128,7 +128,7 @@ describe('POST /api/shops', () => {
 
   test('400s when codLimit is invalid', async () => {
     const { token } = await asAdmin();
-    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+    const image = await factories.createFile();
 
     for (const codLimit of [-1, 10.5, 100001, 'lots']) {
       const res = await request(app)
@@ -216,7 +216,7 @@ describe('PUT /api/shops/:shopId', () => {
   test('lets an admin update the name and imageFile', async () => {
     const shop = await factories.createShop();
     const { token } = await asAdmin();
-    const image = await factories.createFile({ type: 'raw', numberOfPages: undefined });
+    const image = await factories.createFile();
 
     const res = await request(app)
       .put(`/api/shops/${shop._id}`)

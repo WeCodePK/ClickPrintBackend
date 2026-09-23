@@ -43,10 +43,8 @@ async function shopWithMatchingService(rate = 5) {
   return shop;
 }
 
-// The payment proof is an uploaded receipt image rather than a printable
-// document, so it is stored as a raw file.
 async function proofFile(uploadedBy) {
-  return factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy });
+  return factories.createFile({ uploadedBy });
 }
 
 // -------------------------------------------------------------------------- //
@@ -73,17 +71,6 @@ describe('POST /api/drafts', () => {
       .post('/api/drafts')
       .set('Authorization', token)
       .send({ files: [{ file: '00000000-0000-4000-8000-000000000000' }] });
-    expect(res.status).toBe(400);
-  });
-
-  test('400s when a referenced file is not a pdf', async () => {
-    const { user, token } = await authedUser();
-    const rawFile = await factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy: user._id });
-
-    const res = await request(app)
-      .post('/api/drafts')
-      .set('Authorization', token)
-      .send({ files: [{ file: rawFile._id }] });
     expect(res.status).toBe(400);
   });
 

@@ -11,10 +11,15 @@ Built with Express 5, MongoDB (Mongoose) and Gotenberg for document conversion.
 1. **Auth** — a user requests an OTP for their phone number, which is delivered
    over WhatsApp by an external NotifyBot service. Verifying the OTP creates the
    user if needed and returns a 30-day JWT plus the list of shops they own.
-2. **Files** — documents are uploaded to `POST /api/files`. With `convert: true`
-   non-PDF uploads are sent to Gotenberg (LibreOffice) and converted to PDF, and
-   the page count is read back from the PDF metadata. Files live on disk under
-   `files/`, keyed by a UUID.
+2. **Files** — documents are uploaded to `POST /api/files` over the resumable
+   [tus](https://tus.io/protocols/resumable-upload) protocol (pass `filename`
+   and optionally `filetype` in `Upload-Metadata`). The request that delivers
+   the last byte waits while non-PDF uploads are converted to PDF by Gotenberg
+   (LibreOffice) and the page count is read. If conversion fails, the upload
+   fails. Every file keeps its original bytes (`files/original/<id>`) and its
+   PDF (`files/pdf/<id>`), keyed by a UUID. `GET /api/files/:id` returns the
+   original, or the PDF when the client sends `Accept: application/pdf`. It
+   supports `Range` requests, so downloads can be resumed.
 3. **Drafts** — a draft holds a shop plus a list of files, each with its own
    settings (color, page type, pages-per-sheet, orientation, sidedness, copies,
    page selection). `PATCH /drafts/:id/check` prices the draft against the
@@ -74,7 +79,6 @@ if any required variable is missing.
 | `NOTIFYBOT_URL` | yes | Endpoint that delivers OTP messages over WhatsApp |
 | `PORT` | no | Listen port (default `3000`) |
 | `GOTENBERG_URL` | no | Gotenberg base URL (default `http://gotenberg:3000`) |
-| `GOTENBERG_WEBHOOK_URL` | no | URL Gotenberg calls back on (default `http://backend:3000`) |
 
 ## API
 
@@ -86,10 +90,13 @@ Base path is `/api`. Every response has the shape:
 
 ### Authentication
 
-Most routes require `Authorization: Bearer <jwt>`. A few internal routes
-(token minting, Gotenberg callbacks, temp file reads) use
-`Authorization: ApiKey <SERVICE_KEY>` instead. `GET /api/files/:fileId` is
-unauthenticated — file ids are unguessable UUIDs.
+Most routes require `Authorization: Bearer <jwt>`. Token minting uses
+`Authorization: ApiKey <SERVICE_KEY>` instead.
+
+Only the uploader can continue an unfinished upload. A file can be downloaded
+by its uploader, by admins, by owners of a shop with an active job (submitted,
+queued or printing) that uses the file, and by any user when the file is a
+shop's image. Everyone else gets a `404`.
 
 Authorization beyond the token is per-route: `isAdmin` gates admin-only
 operations, and `ownsShops` gates shop-scoped ones.
@@ -105,7 +112,7 @@ operations, and `ownsShops` gates shop-scoped ones.
 | `/api/owners` | Shop ownership management |
 | `/api/printers` | Per-shop printer CRUD |
 | `/api/services` | Per-shop service (pricing) CRUD |
-| `/api/files` | Upload, download, conversion callbacks |
+| `/api/files` | Resumable (tus) upload, download |
 | `/api/drafts` | Draft CRUD, cost check, submit |
 | `/api/jobs` | Job listing and status transitions |
 | `/api/history` | Archived (terminal) jobs |

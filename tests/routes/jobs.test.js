@@ -300,7 +300,7 @@ describe('PATCH /api/jobs/:jobId/status', () => {
   test('archiving a job preserves its payment proof in history', async () => {
     const shop = await factories.createShop();
     const creator = await factories.createUser({ balance: 40 });
-    const proof = await factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy: creator._id });
+    const proof = await factories.createFile({ uploadedBy: creator._id });
     const job = await factories.createJob({
       shop: shop._id,
       createdBy: creator._id,

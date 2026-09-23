@@ -1,5 +1,5 @@
 info:
-  name: Download File (Unauthenticated)
+  name: Download File (User)
   type: http
   seq: 2
 
@@ -10,6 +10,14 @@ http:
     - name: fileId
       value: ""
       type: path
+  headers:
+    - name: Accept
+      value: application/pdf
+      disabled: true
+    - name: Range
+      value: bytes=0-1023
+      disabled: true
+  auth: inherit
 
 settings:
   encodeUrl: true

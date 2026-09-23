@@ -45,12 +45,8 @@ router.post('/', async (req, res) => {
       if (!file.file) {
         return resp(res, 400, `file does not exist`);
       }
-      const record = await File.findById(file.file).select('type').lean();
-      if (!record) {
+      if (!await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
-      }
-      if (record.type !== 'pdf') {
-        return resp(res, 400, `only pdf files are allowed`);
       }
     }
   }
@@ -123,12 +119,8 @@ router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
       if (!file.file) {
         return resp(res, 400, `file does not exist`);
       }
-      const record = await File.findById(file.file).select('type').lean();
-      if (!record) {
+      if (!await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
-      }
-      if (record.type !== 'pdf') {
-        return resp(res, 400, `only pdf files are allowed`);
       }
     }
 

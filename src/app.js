@@ -9,7 +9,6 @@ const { jwtAuth } = require('./func/auth');
 // -------------------------------------------------------------------------- //
 
 process.env.GOTENBERG_URL = process.env.GOTENBERG_URL || 'http://gotenberg:3000';
-process.env.GOTENBERG_WEBHOOK_URL = process.env.GOTENBERG_WEBHOOK_URL || 'http://backend:3000';
 
 // -------------------------------------------------------------------------- //
 
@@ -26,8 +25,19 @@ app.use(morgan('combined', {
 app.use(cors({
   origin: '*',
   maxAge: 7200,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+  allowedHeaders: [
+    'Content-Type', 'Authorization', 'Accept', 'Range', 'If-Range',
+    // tus
+    'Tus-Resumable', 'Upload-Length', 'Upload-Offset', 'Upload-Metadata',
+    'Upload-Defer-Length', 'Upload-Concat', 'X-HTTP-Method-Override',
+  ],
+  exposedHeaders: [
+    'Content-Disposition', 'Content-Length', 'Content-Range', 'Accept-Ranges', 'ETag',
+    // tus
+    'Location', 'Upload-Offset', 'Upload-Length', 'Upload-Expires', 'Upload-Metadata',
+    'Tus-Resumable', 'Tus-Version', 'Tus-Extension', 'Tus-Max-Size',
+  ],
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }));
 
 app.use(express.json({

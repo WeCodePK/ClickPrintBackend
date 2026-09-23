@@ -38,7 +38,7 @@ async function authedUser() {
 describe('POST /api/topups', () => {
   test('400s when amount is not a valid multiple of 10', async () => {
     const { user, token } = await authedUser();
-    const proof = await factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy: user._id });
+    const proof = await factories.createFile({ uploadedBy: user._id });
 
     const res = await request(app)
       .post('/api/topups')
@@ -64,7 +64,7 @@ describe('POST /api/topups', () => {
 
   test('creates a pending topup', async () => {
     const { user, token } = await authedUser();
-    const proof = await factories.createFile({ type: 'raw', numberOfPages: undefined, uploadedBy: user._id });
+    const proof = await factories.createFile({ uploadedBy: user._id });
 
     const res = await request(app)
       .post('/api/topups')
