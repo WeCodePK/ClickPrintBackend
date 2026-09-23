@@ -52,21 +52,21 @@ app.get('/health', async (req, res) => {
 
 // -------------------------------------------------------------------------- //
 
-app.use('/api/admins',    jwtAuth,  require('./routes/Admins.js'));
-app.use('/api/auth',                require('./routes/Auth.js'));
-app.use('/api/contact',             require('./routes/Contact.js'));
-app.use('/api/drafts',    jwtAuth,  require('./routes/Drafts.js'));
-app.use('/api/events',    jwtAuth,  require('./routes/Events.js'));
-app.use('/api/files',               require('./routes/Files.js'));
-app.use('/api/history',   jwtAuth,  require('./routes/History.js'));
-app.use('/api/jobs',      jwtAuth,  require('./routes/Jobs.js'));
-app.use('/api/owners',    jwtAuth,  require('./routes/Owners.js'));
-app.use('/api/printers',  jwtAuth,  require('./routes/Printers.js'));
-app.use('/api/services',  jwtAuth,  require('./routes/Services.js'));
-app.use('/api/shops',     jwtAuth,  require('./routes/Shops.js'));
-app.use('/api/stats',     jwtAuth,  require('./routes/Stats.js'));
-app.use('/api/topups',    jwtAuth,  require('./routes/Topups.js'));
-app.use('/api/users',     jwtAuth,  require('./routes/Users.js'));
+app.use('/admins',    jwtAuth,  require('./routes/Admins.js'));
+app.use('/auth',                require('./routes/Auth.js'));
+app.use('/contact',             require('./routes/Contact.js'));
+app.use('/drafts',    jwtAuth,  require('./routes/Drafts.js'));
+app.use('/events',    jwtAuth,  require('./routes/Events.js'));
+app.use('/files',               require('./routes/Files.js'));
+app.use('/history',   jwtAuth,  require('./routes/History.js'));
+app.use('/jobs',      jwtAuth,  require('./routes/Jobs.js'));
+app.use('/owners',    jwtAuth,  require('./routes/Owners.js'));
+app.use('/printers',  jwtAuth,  require('./routes/Printers.js'));
+app.use('/services',  jwtAuth,  require('./routes/Services.js'));
+app.use('/shops',     jwtAuth,  require('./routes/Shops.js'));
+app.use('/stats',     jwtAuth,  require('./routes/Stats.js'));
+app.use('/topups',    jwtAuth,  require('./routes/Topups.js'));
+app.use('/users',     jwtAuth,  require('./routes/Users.js'));
 
 // -------------------------------------------------------------------------- //
 
