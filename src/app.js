@@ -9,7 +9,7 @@ const { jwtAuth } = require('./func/auth');
 // -------------------------------------------------------------------------- //
 
 process.env.GOTENBERG_URL = process.env.GOTENBERG_URL || 'http://gotenberg:3000';
-process.env.GOTENBERG_WEBHOOK_URL = process.env.GOTENBERG_WEBHOOK_URL || 'http://backend';
+process.env.GOTENBERG_WEBHOOK_URL = process.env.GOTENBERG_WEBHOOK_URL || 'http://backend:3000';
 
 // -------------------------------------------------------------------------- //
 

@@ -51,7 +51,7 @@ npm run dev
 
 `npm run dev` builds the images, brings up the stack (backend + Gotenberg) and
 tails the backend logs; nodemon rebuilds on change. The API listens on
-`http://localhost`.
+`http://localhost:3000`.
 
 To run it plain, without the dev loop:
 
@@ -72,9 +72,9 @@ if any required variable is missing.
 | `SERVICE_KEY` | yes | Shared key for service-to-service endpoints (`Authorization: ApiKey …`) |
 | `EXPO_ACCESS_TOKEN` | yes | Expo push notification access token |
 | `NOTIFYBOT_URL` | yes | Endpoint that delivers OTP messages over WhatsApp |
-| `PORT` | no | Listen port (default `80`) |
+| `PORT` | no | Listen port (default `3000`) |
 | `GOTENBERG_URL` | no | Gotenberg base URL (default `http://gotenberg:3000`) |
-| `GOTENBERG_WEBHOOK_URL` | no | URL Gotenberg calls back on (default `http://backend`) |
+| `GOTENBERG_WEBHOOK_URL` | no | URL Gotenberg calls back on (default `http://backend:3000`) |
 
 ## API
 
