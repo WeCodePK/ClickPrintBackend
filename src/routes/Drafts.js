@@ -260,8 +260,17 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
     await session.withTransaction(async () => {
       await Draft.deleteOne({ _id: req.params.draftId }, { session });
 
+      // Atomically claim the shop's next job number and wrap it into 0000-9999
+      const counted = await Shop.findByIdAndUpdate(
+        draft.shop,
+        { $inc: { jobCounter: 1 } },
+        { session, returnDocument: 'after', projection: { jobCounter: 1 } }
+      );
+      const code = String(counted.jobCounter % 10000).padStart(4, '0');
+
       [job] = await Job.create([{
         ...draft.toObject(),
+        code,
         status: 'submitted',
         statusHistory: [{ by: 'user', status: 'submitted' }]
       }], { session });

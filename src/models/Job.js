@@ -39,6 +39,12 @@ const statusHistorySchema = new mongoose.Schema({
 
 jobSchema.add({
 
+  // Short per-shop identifier (0000-9999), counts up and wraps around
+  code: {
+    type: String,
+    match: [/^\d{4}$/, 'Field `code` must be exactly 4 digits'],
+  },
+
   status: {
     type: String,
     default: 'submitted',

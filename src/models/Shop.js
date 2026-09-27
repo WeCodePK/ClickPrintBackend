@@ -184,6 +184,13 @@ const shopSchema = new mongoose.Schema({
     required: [true, 'Field `isDisabled` is required'],
   },
 
+  // Total jobs ever submitted to this shop; drives the 4-digit job codes
+  jobCounter: {
+    type: Number,
+    default: 0,
+    select: false,
+  },
+
   lastSeen: {
     type: Date,
     required: true,

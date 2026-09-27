@@ -6,6 +6,7 @@ let app;
 let Draft;
 let Job;
 let User;
+let Shop;
 let factories;
 
 beforeAll(async () => {
@@ -14,6 +15,7 @@ beforeAll(async () => {
   Draft = require('../../src/models/Draft');
   Job = require('../../src/models/Job');
   User = require('../../src/models/User');
+  Shop = require('../../src/models/Shop');
   factories = require('../helpers/factories');
 });
 
@@ -435,5 +437,32 @@ describe('PATCH /api/drafts/:draftId/submit', () => {
 
     const updatedUser = await User.findById(user._id);
     expect(updatedUser.balance).toBe(1000 - 60);
+  });
+
+  test('assigns sequential 4-digit job codes per shop, wrapping 9999 -> 0000', async () => {
+    const { user, token } = await authedUser({ balance: 1000 });
+    const shop = await shopWithMatchingService(5);
+    const otherShop = await shopWithMatchingService(5);
+    const file = await factories.createFile({ uploadedBy: user._id, numberOfPages: 1 });
+
+    const submit = async (shopId) => {
+      const draft = await factories.createDraft({
+        createdBy: user._id,
+        shop: shopId,
+        files: [{ file: file._id, settings: factories.fileSettings() }],
+      });
+      const res = await request(app).patch(`/api/drafts/${draft._id}/submit`).set('Authorization', token);
+      expect(res.status).toBe(200);
+      return res.body.data.job.code;
+    };
+
+    expect(await submit(shop._id)).toBe('0001');
+    expect(await submit(shop._id)).toBe('0002');
+    expect(await submit(otherShop._id)).toBe('0001');
+
+    await Shop.updateOne({ _id: shop._id }, { jobCounter: 9998 });
+    expect(await submit(shop._id)).toBe('9999');
+    expect(await submit(shop._id)).toBe('0000');
+    expect(await submit(shop._id)).toBe('0001');
   });
 });
