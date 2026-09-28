@@ -31,9 +31,8 @@ Built with Express 5, MongoDB (Mongoose) and Gotenberg for document conversion.
    cost breakdown. See [src/func/cost.js](src/func/cost.js).
 5. **Jobs** — jobs move through a state machine
    (`draft → submitted → queued → printing → completed | failed | cancelled`)
-   with per-role transition rules. Transitions fire side effects: submitting
-   deducts the user's wallet balance, cancel/fail refunds it, and terminal jobs
-   are archived into the `History` collection. See
+   with per-role transition rules. When a job reaches a terminal state, it is
+   archived into the `History` collection. See
    [src/func/jobs.js](src/func/jobs.js) and [src/func/effects.js](src/func/effects.js).
 6. **Realtime** — shops subscribe to `GET /api/events/:shopId` (SSE) for
    `jobsUpdate` events; users get Expo push notifications on status changes.
@@ -114,7 +113,6 @@ operations, and `ownsShops` gates shop-scoped ones.
 | `/api/drafts` | Draft CRUD, cost check, submit |
 | `/api/jobs` | Job listing and status transitions |
 | `/api/history` | Archived (terminal) jobs |
-| `/api/topups` | Wallet top-up requests and approval |
 | `/api/stats` | Aggregate counts (admin only) |
 | `/api/events/:shopId` | Server-sent events stream for a shop |
 

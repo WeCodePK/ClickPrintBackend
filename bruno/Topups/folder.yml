@@ -1,7 +1,0 @@
-info:
-  name: Topups
-  type: folder
-  seq: 13
-
-request:
-  auth: inherit

@@ -1,4 +1,4 @@
-const { deductWallet, issueRefund, moveJobToHistory } = require('./effects');
+const { moveJobToHistory } = require('./effects');
 
 // -------------------------------------------------------------------------- //
 
@@ -18,9 +18,8 @@ const ROLE = Object.freeze({
 });
 
 const SIDE_EFFECTS = {
-  [STATUS.SUBMITTED]: [deductWallet],
-  [STATUS.CANCELLED]: [issueRefund, moveJobToHistory],
-  [STATUS.FAILED]:    [issueRefund, moveJobToHistory],
+  [STATUS.CANCELLED]: [moveJobToHistory],
+  [STATUS.FAILED]:    [moveJobToHistory],
   [STATUS.COMPLETED]: [moveJobToHistory],
 };
 

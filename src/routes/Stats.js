@@ -4,7 +4,6 @@ const router = express.Router();
 const User = require('../models/User');
 const Admin = require('../models/Admin');
 const Shop = require('../models/Shop');
-const Topup = require('../models/Topup');
 const Draft = require('../models/Draft');
 const Job = require('../models/Job');
 const History = require('../models/History');
@@ -88,19 +87,6 @@ router.get('/shops', isAdmin, async (req, res) => {
   ]);
 
   return resp(res, 200, 'fetched shop stats', { stats: { shops, online, offline, disabled } });
-});
-
-router.get('/topups', isAdmin, async (req, res) => {
-  // The status enum has exactly these three values, so the buckets partition the
-  // topups and always sum to the total.
-  const [ topups, approved, declined, pending ] = await Promise.all([
-    Topup.countDocuments(),
-    Topup.countDocuments({ status: 'approved' }),
-    Topup.countDocuments({ status: 'declined' }),
-    Topup.countDocuments({ status: 'pending' }),
-  ]);
-
-  return resp(res, 200, 'fetched topup stats', { stats: { topups, approved, declined, pending } });
 });
 
 router.get('/users', isAdmin, async (req, res) => {

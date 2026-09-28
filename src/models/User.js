@@ -34,16 +34,6 @@ const userSchema = new mongoose.Schema({
     },
   },
 
-  balance: {
-    type: Number,
-    required: [true, 'Field `balance` is required'],
-    default: 0,
-    validate: {
-      validator: (v) => Number.isInteger(v) && v >= 0,
-      message: 'Field `balance` must be a non-negative whole number',
-    },
-  },
-
   isDisabled: {
     type: Boolean,
     default: false,

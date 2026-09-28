@@ -285,9 +285,6 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
   }
 
   catch (err) {
-    if (/insufficient balance/i.test(err.message)) {
-      return resp(res, 402, 'insufficient balance');
-    }
     return next(err);
   }
 
