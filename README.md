@@ -23,7 +23,11 @@ Built with Express 5, MongoDB (Mongoose) and Gotenberg for document conversion.
 3. **Drafts** — a draft holds a shop plus a list of files, each with its own
    settings (color, page type, pages-per-sheet, orientation, sidedness, copies,
    page selection). `PATCH /drafts/:id/check` prices the draft against the
-   shop's services; `PATCH /drafts/:id/submit` turns it into a job.
+   shop's services; `PATCH /drafts/:id/submit` turns it into a job. Shop
+   owners can also make drafts for their WhatsApp and walk-in customers
+   (`source: 'shop'`, with a `channel` and an optional `customer` name and
+   number). Any owner of the shop can work on these, and they stay out of the
+   owner's own user lists.
 4. **Pricing** — each shop defines *services*, keyed by `{ color, pageType,
    sidedness }` with a per-sheet `rate`. For every file the most specific
    matching service wins (cheapest rate breaks ties), sheets are computed from
@@ -110,7 +114,7 @@ operations, and `ownsShops` gates shop-scoped ones.
 | `/api/printers` | Per-shop printer CRUD |
 | `/api/services` | Per-shop service (pricing) CRUD |
 | `/api/files` | Resumable (tus) upload, download |
-| `/api/drafts` | Draft CRUD, cost check, submit |
+| `/api/drafts` | Draft CRUD (user and shop made), cost check, submit |
 | `/api/jobs` | Job listing and status transitions |
 | `/api/history` | Archived (terminal) jobs |
 | `/api/stats` | Aggregate counts (admin only) |

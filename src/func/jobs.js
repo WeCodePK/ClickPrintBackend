@@ -26,7 +26,7 @@ const SIDE_EFFECTS = {
 // Map: from -> { to: [allowedRoles] }
 const TRANSITIONS = {
   [STATUS.DRAFT]: {
-    [STATUS.SUBMITTED]: [ROLE.USER]
+    [STATUS.SUBMITTED]: [ROLE.USER, ROLE.SHOP]
   },
   [STATUS.SUBMITTED]: {
     [STATUS.QUEUED]: [ROLE.SHOP],

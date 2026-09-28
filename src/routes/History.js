@@ -25,7 +25,7 @@ router.get('/{shops/:shopId}', validateObjectIds('shopId', { allowEmpty: true })
     query = {};
   }
   else {
-    query = { createdBy: uid };
+    query = { createdBy: uid, source: { $ne: 'shop' } };
   }
 
   const history = await History.find(query).populate(History.historyPopulate);

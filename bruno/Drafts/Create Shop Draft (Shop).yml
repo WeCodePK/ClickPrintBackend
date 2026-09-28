@@ -1,0 +1,52 @@
+info:
+  name: Create Shop Draft (Shop)
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{host}}/api/drafts"
+  body:
+    type: json
+    data: |-
+      {
+        "source": "shop",
+        "channel": "whatsapp",
+        "shop": "6a77e7500842b630acec5b52",
+        "customer": {
+          "name": "Ali Khan",
+          "number": "923001234567"
+        },
+        "files": [
+          {
+            "file": "55a7a30a-8220-44a1-8d2b-592b32318757",
+            "settings": {
+              "color": false,
+              "pageType": "A4",
+              "pagesPerSheet": 1,
+              "numberOfCopies": 1,
+              "sidedness": "none",
+              "pageSelection": "",
+              "orientation": "portrait"
+            }
+          }
+        ],
+        "additionalComments": "Sent over WhatsApp"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+        if (body && body?.success && body?.data?.draft?._id) {
+          bru.setVar("draftId", body.data.draft._id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

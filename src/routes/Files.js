@@ -12,6 +12,7 @@ const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
 const Owner = require('../models/Owner');
+const Draft = require('../models/Draft');
 const { resp } = require('../func/misc');
 const { jwtAuth, isAdmin } = require('../func/auth');
 
@@ -208,7 +209,7 @@ router.all('/:fileId', isTus, jwtAuth, ownsUpload, tus);
 
 // Uploaders can read their own files and admins can read any file. Any user
 // can read a shop's image, and shop owners can read files attached to active
-// jobs at their shop.
+// jobs at their shop or to drafts the shop made.
 async function canDownload(uid, file) {
   if (String(file.uploadedBy) === uid) return true;
   if (await isAdmin(uid)) return true;
@@ -217,11 +218,12 @@ async function canDownload(uid, file) {
   const shops = await Owner.distinct('shop', { user: uid });
   if (shops.length === 0) return false;
 
-  return Boolean(await Job.exists({
-    shop: { $in: shops },
-    status: { $in: ACTIVE_JOB_STATUSES },
-    $or: [{ 'files.file': file._id }, { paymentProofFile: file._id }],
-  }));
+  const attached = [{ 'files.file': file._id }, { paymentProofFile: file._id }];
+
+  return Boolean(
+    await Job.exists({ shop: { $in: shops }, status: { $in: ACTIVE_JOB_STATUSES }, $or: attached }) ||
+    await Draft.exists({ shop: { $in: shops }, source: 'shop', $or: attached })
+  );
 }
 
 // Serves the original by default, or the PDF rendition when the Accept header

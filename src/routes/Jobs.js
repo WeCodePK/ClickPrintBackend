@@ -14,8 +14,16 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 
 // -------------------------------------------------------------------------- //
 
+// Shop made jobs are acted on through shop ownership alone, so an owner who
+// has since left the shop loses access to the jobs they created there.
+function isAppCreator(job, uid) {
+  return job.source !== 'shop' && job.createdBy.equals(uid);
+}
+
+// -------------------------------------------------------------------------- //
+
 // GET /api/jobs lists every job (admins only); GET /api/jobs/user/:userId
-// lists one user's jobs (that user, or an admin on their behalf).
+// lists one user's own app jobs (that user, or an admin on their behalf).
 router.get(['/', '/user/:userId'], validateObjectIds('userId', { allowEmpty: true }), async (req, res) => {
   const { userId } = req.params;
   const admin = await isAdmin(req.token.uid);
@@ -24,7 +32,7 @@ router.get(['/', '/user/:userId'], validateObjectIds('userId', { allowEmpty: tru
     return resp(res, 403, 'forbidden');
   }
 
-  const filter = userId ? { createdBy: userId } : {};
+  const filter = userId ? { createdBy: userId, source: { $ne: 'shop' } } : {};
   const jobs = await Job
     .find(filter)
     .populate(Job.jobPopulate)
@@ -58,7 +66,7 @@ router.get('/:jobId', validateObjectIds('jobId'), async (req, res) => {
   if (!job) return resp(res, 404, 'not found');
 
   const isAdm = await isAdmin(req.token.uid);
-  const isCreator = job.createdBy.equals(req.token.uid);
+  const isCreator = isAppCreator(job, req.token.uid);
   const isOwner = await ownsShops(req.token.uid, job.shop);
 
   if (!isAdm && !isCreator && !isOwner) return resp(res, 404, 'not found');
@@ -81,7 +89,7 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
     const job = await Job.findById(jobId);
     if (!job) return resp(res, 404, 'not found');
 
-    const isCreator = job.createdBy.equals(req.token.uid);
+    const isCreator = isAppCreator(job, req.token.uid);
     const isOwner = await ownsShops(req.token.uid, job.shop);
 
     if (!isCreator && !isOwner) return resp(res, 403, 'forbidden');

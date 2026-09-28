@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { isValidPhoneNumber } = require('../func/misc');
 
 const settingsSchema = new mongoose.Schema({
 
@@ -162,7 +163,62 @@ const costSchema = new mongoose.Schema({
 
 }, { _id: false, timestamps: false, versionKey: false, });
 
+// Who a shop made draft is for. A plain snapshot rather than a User ref, since
+// these customers never verified their number with us.
+const customerSchema = new mongoose.Schema({
+
+  name: {
+    type: String,
+    default: '',
+    trim: true,
+    set: (v) => typeof v === 'string' ? v.replace(/\s+/g, ' ').trim() : v,
+    maxlength: [50, 'Field `customer.name` can not exceed 50 characters'],
+  },
+
+  number: {
+    type: String,
+    default: '',
+    trim: true,
+    validate: {
+      validator: (v) => v === '' || isValidPhoneNumber(v),
+      message: 'Field `customer.number` must be in 923XXXXXXXXX format',
+    },
+  },
+
+}, { _id: false, timestamps: false, versionKey: false, });
+
 const draftSchema = new mongoose.Schema({
+
+  // 'app' drafts are made by a user for themselves; 'shop' drafts are made by
+  // a shop's owners on behalf of a WhatsApp or walk-in customer.
+  source: {
+    type: String,
+    default: 'app',
+    immutable: true,
+    required: [true, 'Field `source` is required'],
+    enum: {
+      values: ['app', 'shop'],
+      message: '`{VALUE}` is not a valid value for field `source`',
+    },
+  },
+
+  channel: {
+    type: String,
+    required: [function () { return this.source === 'shop'; }, 'Field `channel` is required on shop drafts'],
+    enum: {
+      values: ['whatsapp', 'walkin'],
+      message: '`{VALUE}` is not a valid value for field `channel`',
+    },
+    validate: {
+      validator: function (v) { return this.source === 'shop'; },
+      message: 'Field `channel` is only allowed on shop drafts',
+    },
+  },
+
+  customer: {
+    required: false,
+    type: customerSchema,
+  },
 
   files: {
     default: [],

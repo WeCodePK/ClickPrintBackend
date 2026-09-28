@@ -75,7 +75,10 @@ async function sendPush(pushTokens, { title, body, data }) {
 
 // -------------------------------------------------------------------------- //
 
+// Shop made jobs have no app user to notify; the shop tells its customer.
 async function notifyUserOnJobStatus(job) {
+  if (job.source === 'shop') return [];
+
   const user = await User.findById(job.createdBy);
 
   const tickets = await sendPush(user.pushTokens, {
