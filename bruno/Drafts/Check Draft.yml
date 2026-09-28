@@ -1,11 +1,11 @@
 info:
-  name: Delete Draft (User)
+  name: Check Draft
   type: http
-  seq: 6
+  seq: 7
 
 http:
-  method: DELETE
-  url: "{{host}}/api/drafts/:draftId"
+  method: PATCH
+  url: "{{host}}/api/drafts/:draftId/check"
   params:
     - name: draftId
       value: "{{draftId}}"
@@ -17,3 +17,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

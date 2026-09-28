@@ -7,5 +7,3 @@ variables:
     name: token
   - secret: true
     name: number
-  - secret: true
-    name: SERVICE_KEY

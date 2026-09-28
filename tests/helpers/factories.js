@@ -30,10 +30,6 @@ function bearer(payload, options) {
   return `Bearer ${signToken(payload, options)}`;
 }
 
-function apiKey() {
-  return `ApiKey ${process.env.SERVICE_KEY}`;
-}
-
 // -------------------------------------------------------------------------- //
 
 async function createUser(overrides = {}) {
@@ -219,7 +215,6 @@ module.exports = {
   phoneNumber,
   signToken,
   bearer,
-  apiKey,
   createUser,
   createAdmin,
   createOwner,

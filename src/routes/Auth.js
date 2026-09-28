@@ -6,7 +6,7 @@ const router = express.Router();
 const Otp = require('../models/Otp');
 const User = require('../models/User');
 
-const { keyAuth, ownsShops, isAdmin } = require('../func/auth');
+const { ownsShops, isAdmin } = require('../func/auth');
 const { resp, sendViaSms, isValidPhoneNumber } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -131,28 +131,6 @@ router.post('/verify', async (req, res) => {
   );
 
   return resp(res, 200, 'otp verified', { user, shops, token });
-});
-
-// -------------------------------------------------------------------------- //
-
-router.post('/mint', keyAuth, async (req, res) => {
-  const { number } = req.body || {};
-
-  if (!number) return resp(res, 400, 'number is required');
-  if (!isValidPhoneNumber(number)) return resp(res, 400, `number must be in 92XXXXXXXXXX format`);
-
-  const user = await User.findOneAndUpdate(
-    { number },
-    { $setOnInsert: { number } },
-    { upsert: true, returnDocument: 'after' }
-  );
-
-  const token = jwt.sign(
-    { uid: user._id },
-    process.env.JWT_SECRET
-  );
-
-  return resp(res, 200, 'minted token', { token, user });
 });
 
 // -------------------------------------------------------------------------- //

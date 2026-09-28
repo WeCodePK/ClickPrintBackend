@@ -6,7 +6,6 @@ const app = require('./app');
 
 const required = [
   'JWT_SECRET',
-  'SERVICE_KEY',
   'EXPO_ACCESS_TOKEN',
   'MONGODB_URI',
   'SMSGATE_URL',

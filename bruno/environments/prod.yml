@@ -5,7 +5,10 @@ variables:
     value: https://api.clickprint.pk
   - secret: true
     name: token
+    description: ""
   - secret: true
     name: number
+    description: ""
   - secret: true
-    name: SERVICE_KEY
+    name: fileId
+    description: ""

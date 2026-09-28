@@ -74,7 +74,6 @@ if any required variable is missing.
 | --- | --- | --- |
 | `MONGODB_URI` | yes | MongoDB connection string |
 | `JWT_SECRET` | yes | Secret used to sign and verify client JWTs |
-| `SERVICE_KEY` | yes | Shared key for service-to-service endpoints (`Authorization: ApiKey …`) |
 | `EXPO_ACCESS_TOKEN` | yes | Expo push notification access token |
 | `NOTIFYBOT_URL` | yes | Endpoint that delivers OTP messages over WhatsApp |
 | `PORT` | no | Listen port (default `3000`) |
@@ -90,8 +89,7 @@ Base path is `/api`. Every response has the shape:
 
 ### Authentication
 
-Most routes require `Authorization: Bearer <jwt>`. Token minting uses
-`Authorization: ApiKey <SERVICE_KEY>` instead.
+Most routes require `Authorization: Bearer <jwt>`.
 
 Only the uploader can continue an unfinished upload. A file can be downloaded
 by its uploader, by admins, by owners of a shop with an active job (submitted,
@@ -105,7 +103,7 @@ operations, and `ownsShops` gates shop-scoped ones.
 
 | Prefix | Purpose |
 | --- | --- |
-| `/api/auth` | Send OTP, verify OTP, mint token (service) |
+| `/api/auth` | Send OTP, verify OTP |
 | `/api/users` | User CRUD, disable/enable |
 | `/api/admins` | Admin list, grant, revoke (admin only) |
 | `/api/shops` | Shop CRUD, disable/enable, heartbeat status |

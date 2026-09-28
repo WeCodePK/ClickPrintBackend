@@ -15,7 +15,6 @@ services:
       - ./files:/app/files
     environment:
       JWT_SECRET: ${JWT_SECRET}
-      SERVICE_KEY: ${SERVICE_KEY}
       EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN}
       MONGODB_URI: ${MONGODB_URI}
       SMSGATE_URL: ${SMSGATE_URL}

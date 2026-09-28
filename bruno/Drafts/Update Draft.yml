@@ -1,5 +1,5 @@
 info:
-  name: Update Draft (User)
+  name: Update Draft
   type: http
   seq: 5
 
@@ -14,12 +14,12 @@ http:
     type: json
     data: |-
       {
-        "shop": "6a5d954812722b1be6c0ca20",
+        "shop": "6a77e7500842b630acec5b52",
         "files": [
           {
-            "file": "58f91b59-2014-4ddd-968b-88ba9668cd1e",
+            "file": "1b8a329b-0ea5-4c66-9abd-ef46e75922fd",
             "settings": {
-              "color": true,
+              "color": false,
               "pageType": "A4",
               "pagesPerSheet": 1,
               "numberOfCopies": 1,
@@ -29,8 +29,8 @@ http:
             }
           }
         ],
-        "additionalComments": "Binding no longer needed, loose sheets are fine",
-        "paymentProofFile": "95e498e0-ade0-4b12-9317-00772d61142e"
+        "paymentProofFile": "95e498e0-ade0-4b12-9317-00772d61142e",
+        "additionalComments": "Please staple each copy in the top-left corner"
       }
   auth: inherit
 
@@ -39,3 +39,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

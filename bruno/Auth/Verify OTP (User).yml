@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "code": "34599",
+        "code": "61419",
         "number": "{{number}}"
       }
 
@@ -18,12 +18,15 @@ runtime:
   scripts:
     - type: after-response
       code: |-
-        const data = res.getBody();
-        if (data && data.success && data.data && data.data.token)
-          bru.setVar("token", data.data.token);
+        const body = res.getBody();
+        if (body?.success) {
+          bru.setVar("token", body.data.token);
+          bru.setVar("userId", body.data.user._id);  
+        }
 
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true
