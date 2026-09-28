@@ -171,13 +171,11 @@ const server = new Server({
   },
 });
 
-if (process.env.NODE_ENV !== 'test') {
-  setInterval(() => {
-    server.cleanUpExpiredUploads().catch((err) => {
-      console.error('[ERROR] Failed to clean up expired uploads:', err);
-    });
-  }, 60 * 60 * 1000).unref();
-}
+setInterval(() => {
+  server.cleanUpExpiredUploads().catch((err) => {
+    console.error('[ERROR] Failed to clean up expired uploads:', err);
+  });
+}, 60 * 60 * 1000).unref();
 
 // -------------------------------------------------------------------------- //
 

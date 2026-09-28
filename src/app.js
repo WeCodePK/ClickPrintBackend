@@ -19,7 +19,7 @@ app.set('trust proxy', true);
 // -------------------------------------------------------------------------- //
 
 app.use(morgan('combined', {
-  skip: (req, res) => req.path === '/health' || process.env.NODE_ENV === 'test'
+  skip: (req, res) => req.path === '/health'
 }));
 
 app.use(cors({
