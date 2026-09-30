@@ -76,6 +76,7 @@ app.use('/api/services',  jwtAuth,  require('./routes/Services.js'));
 app.use('/api/shops',     jwtAuth,  require('./routes/Shops.js'));
 app.use('/api/stats',     jwtAuth,  require('./routes/Stats.js'));
 app.use('/api/users',     jwtAuth,  require('./routes/Users.js'));
+app.use('/api/webhooks',  jwtAuth,  require('./routes/Webhooks.js'));
 
 // -------------------------------------------------------------------------- //
 

@@ -1,0 +1,45 @@
+info:
+  name: Inference (Shop)
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/webhooks/inference"
+  body:
+    type: json
+    data: |-
+      {
+        "shop": "6a77e7500842b630acec5b52",
+        "message": "iss ka pehla page color mein, baqi black white, single side",
+        "files": [
+          {
+            "name": "thesis.docx",
+            "pages": 12,
+            "parts": [
+              {
+                "pages": "",
+                "print": true,
+                "color": false,
+                "pageType": "A4",
+                "sides": "double",
+                "duplex": "long",
+                "orientation": "portrait",
+                "pagesPerSheet": 1,
+                "copies": 1
+              }
+            ]
+          }
+        ],
+        "history": [
+          { "from": "shop", "text": "Got `thesis.docx` (12 pages) ✅ How should I print it?" }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
