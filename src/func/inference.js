@@ -19,6 +19,7 @@ const LIMITS = {
   pages: 10000,       // pages in one file
   changes: 20,        // changes accepted from the model
   question: 300,      // characters in a clarifying question
+  comment: 300,       // characters of instructions for the shop
 };
 
 const RATE = { perMinute: 30, perDay: 1000 };
@@ -44,7 +45,7 @@ Customers write in English, Roman Urdu or Urdu script, often mixed and informal.
 
 Return:
 - intent:
-  - "settings": they say how to print (color, sides, copies, pages, paper size, orientation, pages per sheet).
+  - "settings": they say how to print (color, sides, copies, pages, paper size, orientation, pages per sheet), or give the shop other instructions about the order (see comment).
   - "price": they ask what it costs, the total or the bill.
   - "confirm": they clearly say to go ahead and print or place the order.
   - "cancel": they clearly say to cancel or drop the whole order.
@@ -64,6 +65,7 @@ Return:
   - copies: the number of copies ("2 copies", "do copy", "3 set"); null if not mentioned.
   Leave everything they didn't mention as null. Don't restate the current settings.
 - question: only for "unclear": one short question in the customer's language asking what they want. Else "".
+- comment: instructions for the shop about this order that aren't print settings: stapling, binding, file order, "urgent", "keep it ready by 5". Short, in the customer's own words. Only for "settings" or "confirm", else "". Never put print settings here, and never put anything here that isn't an instruction about the order.
 
 Never mention prices, totals, times or promises. When a message mixes settings with other chat, the intent is "settings".
 
@@ -72,6 +74,8 @@ Examples (files: 1 = "notes.pdf", 12 pages):
 - "iss ka pehla page color mein, baqi black white, single side" -> settings, roman_urdu, [{ files: [1], pages: "", color: false, sides: "single" }, { files: [1], pages: "1", color: true }]
 - "sirf page 3 se 7 print karna, 2 copies" -> settings, roman_urdu, [{ files: [1], pages: "3-7", only: true, copies: 2 }]
 - "A3 on both sides please" -> settings, en, [{ files: [], pages: "", pageType: "A3", sides: "double" }]
+- "staple kar dena" -> settings, roman_urdu, [], comment: "staple kar dena"
+- "dono color mein aur spiral binding bhi" -> settings, roman_urdu, [{ files: [], pages: "", color: true }], comment: "spiral binding"
 - "kitne paise banenge?" -> price, roman_urdu, []
 - "theek hai print kar do" -> confirm, roman_urdu, []
 - "shukriya, kab tak mil jayega?" -> offtopic, roman_urdu, []
@@ -86,7 +90,7 @@ const nullableEnum = (type, values) => ({ type: [type, 'null'], enum: [...values
 const SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['intent', 'language', 'changes', 'question'],
+  required: ['intent', 'language', 'changes', 'question', 'comment'],
   properties: {
     intent: { type: 'string', enum: INTENTS },
     language: { type: 'string', enum: LANGUAGES },
@@ -111,6 +115,7 @@ const SCHEMA = {
       },
     },
     question: { type: 'string' },
+    comment: { type: 'string' },
   },
 };
 
@@ -321,5 +326,9 @@ exports.sanitize = (raw, files) => {
     ? truncate(result.question.trim(), LIMITS.question)
     : '';
 
-  return { intent, language, changes, question };
+  const comment = ['settings', 'confirm'].includes(intent) && typeof result.comment === 'string'
+    ? truncate(result.comment.replace(/\s+/g, ' ').trim(), LIMITS.comment)
+    : '';
+
+  return { intent, language, changes, question, comment };
 };

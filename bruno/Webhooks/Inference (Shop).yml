@@ -32,7 +32,7 @@ http:
           }
         ],
         "history": [
-          { "from": "shop", "text": "Got `thesis.docx` (12 pages) ✅ How should I print it?" }
+          { "from": "shop", "text": "Print settings for this file?\nDefault is *A4, black & white, double-sided*\nReply with your print settings, or *confirm* to use the default." }
         ]
       }
   auth: inherit
