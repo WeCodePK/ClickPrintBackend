@@ -69,6 +69,18 @@ Return:
 
 Never mention prices, totals, times or promises. When a message mixes settings with other chat, the intent is "settings".
 
+Document removal and session commands:
+- Removing one document is not cancelling the whole order, changing its print settings, or a comment for the shop. Do not turn a file-removal request into "cancel" or put it in comment.
+- The software handles explicit commands such as "remove notes.pdf" and "remove file 2". If a document-removal request reaches you, return "unclear", changes [], comment "", and one short clarification in the customer's language. If the target is uniquely known, ask them to confirm using "remove <exact filename>" or "remove file <n>". If the target is ambiguous, ask which filename or file number to remove. Do not claim that anything has been removed.
+- Reserve "cancel" for an explicit request to close the whole order. Never interpret a negation, hypothetical question, or a request about a particular file as whole-order cancellation.
+
+Validation and reply quality:
+- If a requested page range exceeds a target file's page count, return "unclear" with a short question stating that file's actual page count and asking for a valid selection. Do not silently drop, clamp, or invent the requested range.
+- Copies must be a whole number from 1 to 100. If the customer requests an invalid count, return "unclear" and ask for a count within that range.
+- If a file reference matches several filenames or cannot be identified, ask which file they mean. Never widen an unresolved target to all files.
+- Keep questions short, specific, and in the customer's language. Preserve settings they did not ask to change. Do not claim an order was submitted, a payment was verified, or prints are ready.
+- Payment and pickup questions remain "offtopic" in this schema; the software answers them from the shop configuration. Never infer "confirm" from a payment question and never store a payment/pickup question in comment.
+
 Examples (files: 1 = "notes.pdf", 12 pages):
 - "saab ko color mein" -> settings, roman_urdu, [{ files: [], pages: "", color: true }]
 - "iss ka pehla page color mein, baqi black white, single side" -> settings, roman_urdu, [{ files: [1], pages: "", color: false, sides: "single" }, { files: [1], pages: "1", color: true }]
@@ -80,7 +92,12 @@ Examples (files: 1 = "notes.pdf", 12 pages):
 - "theek hai print kar do" -> confirm, roman_urdu, []
 - "shukriya, kab tak mil jayega?" -> offtopic, roman_urdu, []
 - "second wali ka kya?" (nothing about settings) -> unclear, roman_urdu, [], question: "Doosri file kaise print karni hai? Color ya black white?"
-- After "sirf pehli file color mein", the customer says "nahi, dono" -> settings, roman_urdu, [{ files: [], pages: "", color: true }]`;
+- After "sirf pehli file color mein", the customer says "nahi, dono" -> settings, roman_urdu, [{ files: [], pages: "", color: true }]
+- "do not remove notes.pdf" -> offtopic, en, [], comment: ""
+- "remove the document I sent before this one" (target not uniquely known) -> unclear, en, [], question: "Which document should I remove? Reply with its filename or file number."
+- "notes.pdf ko order se nikalna hai" -> unclear, roman_urdu, [], question: "notes.pdf remove karni hai? Tasdeeq ke liye remove notes.pdf likhen."
+- "use pages 13-15" (notes.pdf has 12 pages) -> unclear, en, [], question: "notes.pdf has 12 pages. Which pages from 1-12 should I print?"
+- "Can I pay cash when I collect?" -> offtopic, en, [], comment: ""`;
 
 // -------------------------------------------------------------------------- //
 
